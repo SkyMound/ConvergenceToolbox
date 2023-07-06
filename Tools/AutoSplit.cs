@@ -7,6 +7,9 @@ using System.Text;
 using System.Collections;
 using System.IO;
 using DS.Tech.UI;
+using DS.Game.Items;
+using DS.Tech.Util;
+using DS.Tech.ProjectSettings;
 
 namespace TTestCheat
 {
@@ -73,7 +76,21 @@ namespace TTestCheat
             return UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.SecondsPlayed;
         }
 
+        public void ListenForEndOfRun()
+        {
+            UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.MergedInventoryStacker.ItemAmountChanged += new ItemAmountChanged(this.CheckFutureEkko3Defeated);
+        }
 
+        public void CheckFutureEkko3Defeated(UnityGuid itemID, int oldAmount, int newAmount)
+        {
+            if (!itemID.IsValid() || newAmount <= oldAmount)
+                return;
+            if(itemID == Configuration<AchievementConfig>.Instance.Asset.FutureEkko3DefeatedItemID)
+            {
+                SendCommand(2);
+            }
+            
+        }
 
         public void StartAutoSplit()
         {
@@ -131,6 +148,7 @@ namespace TTestCheat
                         message = "start\r\n";
                         _splitNumber++;
                         _hasStarted = true;
+
                         break;
                     case 1:
                         message = "split\r\n";
@@ -331,15 +349,6 @@ namespace TTestCheat
                             case 19: // Zarkon 2
 
                                 if (GetGadgetSlots() == 9) SendCommand(1);
-                                break;
-
-                            case 20: // Future Ekko 3
-
-                                // Not the best reference at all (the player can skip the credit), replace asap
-                                if (credits == null)
-                                    credits = FindObjectOfType<Credits>();
-                                else if (credits.enabled)
-                                    SendCommand(2);
                                 break;
 
                             default:
