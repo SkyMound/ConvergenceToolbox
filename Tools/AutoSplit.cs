@@ -27,6 +27,7 @@ namespace TTestCheat
         PlatformerController2D_Server controller2D; // Double jump
         Dodger_Server dodger; // Dash
         UITransitions transitions;
+        Credits credits;
 
 
         public void Start()
@@ -137,6 +138,7 @@ namespace TTestCheat
                         break;
                     case 2:
                         message = "stop\r\n";
+                        _isRunning = false;
                         break;
                     case 3:
                         message = "pause\r\n";
@@ -214,138 +216,145 @@ namespace TTestCheat
         {
             while (_isEnabled)
             {
-                try
+                if(_hasStarted && _isRunning)
                 {
-                    switch (_splitNumber)
+                    try
                     {
-                        case 0: // Checks if a game has just been created
+                        switch (_splitNumber)
+                        {
+                            case 0: // Checks if a game has just been created
 
-                            if (HasLoadGame() && GetSecondsPlayed() < 1f)
-                                SendCommand(0);
-                            break;
+                                if (HasLoadGame() && GetSecondsPlayed() < 1f)
+                                    SendCommand(0);
+                                break;
 
-                        case 1: // Scary Janet
+                            case 1: // Scary Janet
 
-                            if (hero == null)
-                                hero = FindObjectOfType<Hero_Server>();
-                            else if (hero.HasTimewinderAbility)
-                                SendCommand(1);
-                            break;
+                                if (hero == null)
+                                    hero = FindObjectOfType<Hero_Server>();
+                                else if (hero.HasTimewinderAbility)
+                                    SendCommand(1);
+                                break;
 
-                        case 2: // Future Ekko 1
+                            case 2: // Future Ekko 1
 
-                            if (GetGadgetSlots() == 3) SendCommand(1);
-                            break;
+                                if (GetGadgetSlots() == 3) SendCommand(1);
+                                break;
 
-                        case 3: // Factorywood
+                            case 3: // Factorywood
 
-                            if (GetWorldZone() == UpdraftWorldZone.P2_Factorywood) SendCommand(1);
-                            break;
+                                if (GetWorldZone() == UpdraftWorldZone.P2_Factorywood) SendCommand(1);
+                                break;
 
 
-                        case 4: // Vigilnaut
+                            case 4: // Vigilnaut
 
-                            if (hero.HasParallelConvergenceAbility) SendCommand(1);
-                            break;
+                                if (hero.HasParallelConvergenceAbility) SendCommand(1);
+                                break;
 
-                        case 5: // Zarkon 1 
+                            case 5: // Zarkon 1 
 
-                            if (GetGadgetSlots() == 4) SendCommand(1);
-                            break;
+                                if (GetGadgetSlots() == 4) SendCommand(1);
+                                break;
 
-                        case 6: // Sump sewers
+                            case 6: // Sump sewers
 
-                            if (GetWorldZone() == UpdraftWorldZone.P3_Sump) SendCommand(1);
-                            break;
+                                if (GetWorldZone() == UpdraftWorldZone.P3_Sump) SendCommand(1);
+                                break;
 
-                        case 7: // Drake
+                            case 7: // Drake
 
-                            if (hero.HasPhaseDiveAbility) SendCommand(1);
-                            break;
+                                if (hero.HasPhaseDiveAbility) SendCommand(1);
+                                break;
 
-                        case 8: // Warwick
+                            case 8: // Warwick
 
-                            if (GetGadgetSlots() == 5) SendCommand(1);
-                            break;
+                                if (GetGadgetSlots() == 5) SendCommand(1);
+                                break;
 
-                        case 9: // Cultivair
+                            case 9: // Cultivair
 
-                            if (GetWorldZone() == UpdraftWorldZone.P4_Cultivair) SendCommand(1);
-                            break;
+                                if (GetWorldZone() == UpdraftWorldZone.P4_Cultivair) SendCommand(1);
+                                break;
 
-                        case 10: // Ferros Captain
+                            case 10: // Ferros Captain
 
-                            if (controller2D == null)
-                                controller2D = FindObjectOfType<PlatformerController2D_Server>();
-                            else if (controller2D.AirJumpCount == 1)
-                                SendCommand(1);
-                            break;
+                                if (controller2D == null)
+                                    controller2D = FindObjectOfType<PlatformerController2D_Server>();
+                                else if (controller2D.AirJumpCount == 1)
+                                    SendCommand(1);
+                                break;
 
-                        case 11: // Camille
+                            case 11: // Camille
 
-                            if (GetGadgetSlots() == 6) SendCommand(1);
-                            break;
+                                if (GetGadgetSlots() == 6) SendCommand(1);
+                                break;
 
-                        case 12: // Chaincrawler
+                            case 12: // Chaincrawler
 
-                            if (GetWorldZone() == UpdraftWorldZone.P5_Train) SendCommand(1);
-                            break;
+                                if (GetWorldZone() == UpdraftWorldZone.P5_Train) SendCommand(1);
+                                break;
 
-                        case 13: // Drake and Vale
+                            case 13: // Drake and Vale
 
-                            if (hero.HasTemporalPulseAbility) SendCommand(1);
-                            break;
+                                if (hero.HasTemporalPulseAbility) SendCommand(1);
+                                break;
 
-                        case 14: // Future Ekko 2
+                            case 14: // Future Ekko 2
 
-                            if (GetGadgetSlots() == 7) SendCommand(1);
-                            break;
+                                if (GetGadgetSlots() == 7) SendCommand(1);
+                                break;
 
-                        case 15: // Fenlow theater
+                            case 15: // Fenlow theater
 
-                            if (GetWorldZone() == UpdraftWorldZone.P6_Theatre) SendCommand(1);
-                            break;
+                                if (GetWorldZone() == UpdraftWorldZone.P6_Theatre) SendCommand(1);
+                                break;
 
-                        case 16: // Moshpit Meg
+                            case 16: // Moshpit Meg
 
-                            if (dodger == null)
-                                dodger = FindObjectOfType<Dodger_Server>();
-                            else if (dodger.HasDashAbility)
-                                SendCommand(1);
-                            break;
+                                if (dodger == null)
+                                    dodger = FindObjectOfType<Dodger_Server>();
+                                else if (dodger.HasDashAbility)
+                                    SendCommand(1);
+                                break;
 
-                        case 17: // Jinx
+                            case 17: // Jinx
 
-                            if (GetGadgetSlots() == 8) SendCommand(1);
-                            break;
+                                if (GetGadgetSlots() == 8) SendCommand(1);
+                                break;
 
-                        case 18: // Fairgrounds
+                            case 18: // Fairgrounds
 
-                            if (GetWorldZone() == UpdraftWorldZone.P7_Carnival) SendCommand(1);
-                            break;
+                                if (GetWorldZone() == UpdraftWorldZone.P7_Carnival) SendCommand(1);
+                                break;
 
-                        case 19: // Zarkon 2
+                            case 19: // Zarkon 2
 
-                            if (GetGadgetSlots() == 9) SendCommand(1);
-                            break;
+                                if (GetGadgetSlots() == 9) SendCommand(1);
+                                break;
 
-                        case 20: // Future Ekko 3
-                            break;
+                            case 20: // Future Ekko 3
 
-                        default:
-                            break;
+                                // Not the best reference at all (the player can skip the credit), replace asap
+                                if (credits == null)
+                                    credits = FindObjectOfType<Credits>();
+                                else if (credits.enabled)
+                                    SendCommand(2);
+                                break;
+
+                            default:
+                                break;
+                        }
                     }
-
-
-                }
-                catch (Exception ex)
-                {
-                    using (StreamWriter sw = File.AppendText(path))
+                    catch (Exception ex)
                     {
-                        sw.WriteLine("Exception when checking:" + ex.ToString());
+                        using (StreamWriter sw = File.AppendText(path))
+                        {
+                            sw.WriteLine("Exception when checking:" + ex.ToString());
+                        }
                     }
+                    yield return new WaitForSeconds(_refreshFrequence);
                 }
-                yield return new WaitForSeconds(_refreshFrequence);
             }
         }
 
