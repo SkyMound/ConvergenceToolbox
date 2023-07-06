@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32929.386
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConvergenceToolbox", "ConvergenceToolbox\ConvergenceToolbox.csproj", "{2ACCDEC8-7EC5-40F1-9EFF-AA2A12E772C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools", "Tools\Tools.csproj", "{5B889640-7314-4E7B-B6AB-57C0F7AB825E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2ACCDEC8-7EC5-40F1-9EFF-AA2A12E772C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2ACCDEC8-7EC5-40F1-9EFF-AA2A12E772C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2ACCDEC8-7EC5-40F1-9EFF-AA2A12E772C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2ACCDEC8-7EC5-40F1-9EFF-AA2A12E772C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B889640-7314-4E7B-B6AB-57C0F7AB825E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B889640-7314-4E7B-B6AB-57C0F7AB825E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B889640-7314-4E7B-B6AB-57C0F7AB825E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B889640-7314-4E7B-B6AB-57C0F7AB825E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0DA7435F-3974-4C04-8D6F-95155267E7F9}
+	EndGlobalSection
+EndGlobal
