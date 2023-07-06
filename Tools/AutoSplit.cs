@@ -30,8 +30,6 @@ namespace TTestCheat
         PlatformerController2D_Server controller2D; // Double jump
         Dodger_Server dodger; // Dash
         UITransitions transitions;
-        Credits credits;
-
 
         public void Start()
         {
@@ -87,7 +85,7 @@ namespace TTestCheat
                 return;
             if(itemID == Configuration<AchievementConfig>.Instance.Asset.FutureEkko3DefeatedItemID)
             {
-                SendCommand(2);
+                SendCommand(CommandType.Stop);
             }
             
         }
@@ -136,32 +134,32 @@ namespace TTestCheat
             }
         }
 
-        public void SendCommand(int commandType)
+        public void SendCommand(CommandType type)
         {
             try
             {
                 // Prepare the message to be sent
                 string message;
-                switch (commandType)
+                switch (type)
                 {
-                    case 0:
+                    case CommandType.Start:
                         message = "start\r\n";
                         _splitNumber++;
                         _hasStarted = true;
 
                         break;
-                    case 1:
+                    case CommandType.Split:
                         message = "split\r\n";
                         _splitNumber++;
                         break;
-                    case 2:
+                    case CommandType.Stop:
                         message = "stop\r\n";
                         _isRunning = false;
                         break;
-                    case 3:
+                    case CommandType.Pause:
                         message = "pause\r\n";
                         break;
-                    case 4:
+                    case CommandType.Resume:
                         message = "resume\r\n";
                         break;
                     default:
@@ -202,19 +200,19 @@ namespace TTestCheat
                         if (transitions.IsVisible && !_isPaused)
                         {
                             _isPaused = !_isPaused;
-                            SendCommand(3);
+                            SendCommand(CommandType.Pause);
                         }
                         else if (!transitions.IsVisible)
                         {
                             if (!PauseStack.GetInstance(NetworkCollisionLayer.None).IsPaused && _isPaused)
                             {
                                 _isPaused = !_isPaused;
-                                SendCommand(4);
+                                SendCommand(CommandType.Resume);
                             }
                             else if (PauseStack.GetInstance(NetworkCollisionLayer.None).IsPaused && !_isPaused)
                             {
                                 _isPaused = !_isPaused;
-                                SendCommand(3);
+                                SendCommand(CommandType.Pause);
                             }
                         }
                     }
@@ -243,7 +241,7 @@ namespace TTestCheat
                             case 0: // Checks if a game has just been created
 
                                 if (HasLoadGame() && GetSecondsPlayed() < 1f)
-                                    SendCommand(0);
+                                    SendCommand(CommandType.Start);
                                 break;
 
                             case 1: // Scary Janet
@@ -251,48 +249,48 @@ namespace TTestCheat
                                 if (hero == null)
                                     hero = FindObjectOfType<Hero_Server>();
                                 else if (hero.HasTimewinderAbility)
-                                    SendCommand(1);
+                                    SendCommand(CommandType.Split);
                                 break;
 
                             case 2: // Future Ekko 1
 
-                                if (GetGadgetSlots() == 3) SendCommand(1);
+                                if (GetGadgetSlots() == 3) SendCommand(CommandType.Split);
                                 break;
 
                             case 3: // Factorywood
 
-                                if (GetWorldZone() == UpdraftWorldZone.P2_Factorywood) SendCommand(1);
+                                if (GetWorldZone() == UpdraftWorldZone.P2_Factorywood) SendCommand(CommandType.Split);
                                 break;
 
 
                             case 4: // Vigilnaut
 
-                                if (hero.HasParallelConvergenceAbility) SendCommand(1);
+                                if (hero.HasParallelConvergenceAbility) SendCommand(CommandType.Split);
                                 break;
 
                             case 5: // Zarkon 1 
 
-                                if (GetGadgetSlots() == 4) SendCommand(1);
+                                if (GetGadgetSlots() == 4) SendCommand(CommandType.Split);
                                 break;
 
                             case 6: // Sump sewers
 
-                                if (GetWorldZone() == UpdraftWorldZone.P3_Sump) SendCommand(1);
+                                if (GetWorldZone() == UpdraftWorldZone.P3_Sump) SendCommand(CommandType.Split);
                                 break;
 
                             case 7: // Drake
 
-                                if (hero.HasPhaseDiveAbility) SendCommand(1);
+                                if (hero.HasPhaseDiveAbility) SendCommand(CommandType.Split);
                                 break;
 
                             case 8: // Warwick
 
-                                if (GetGadgetSlots() == 5) SendCommand(1);
+                                if (GetGadgetSlots() == 5) SendCommand(CommandType.Split);
                                 break;
 
                             case 9: // Cultivair
 
-                                if (GetWorldZone() == UpdraftWorldZone.P4_Cultivair) SendCommand(1);
+                                if (GetWorldZone() == UpdraftWorldZone.P4_Cultivair) SendCommand(CommandType.Split);
                                 break;
 
                             case 10: // Ferros Captain
@@ -300,32 +298,32 @@ namespace TTestCheat
                                 if (controller2D == null)
                                     controller2D = FindObjectOfType<PlatformerController2D_Server>();
                                 else if (controller2D.AirJumpCount == 1)
-                                    SendCommand(1);
+                                    SendCommand(CommandType.Split);
                                 break;
 
                             case 11: // Camille
 
-                                if (GetGadgetSlots() == 6) SendCommand(1);
+                                if (GetGadgetSlots() == 6) SendCommand(CommandType.Split);
                                 break;
 
                             case 12: // Chaincrawler
 
-                                if (GetWorldZone() == UpdraftWorldZone.P5_Train) SendCommand(1);
+                                if (GetWorldZone() == UpdraftWorldZone.P5_Train) SendCommand(CommandType.Split);
                                 break;
 
                             case 13: // Drake and Vale
 
-                                if (hero.HasTemporalPulseAbility) SendCommand(1);
+                                if (hero.HasTemporalPulseAbility) SendCommand(CommandType.Split);
                                 break;
 
                             case 14: // Future Ekko 2
 
-                                if (GetGadgetSlots() == 7) SendCommand(1);
+                                if (GetGadgetSlots() == 7) SendCommand(CommandType.Split);
                                 break;
 
                             case 15: // Fenlow theater
 
-                                if (GetWorldZone() == UpdraftWorldZone.P6_Theatre) SendCommand(1);
+                                if (GetWorldZone() == UpdraftWorldZone.P6_Theatre) SendCommand(CommandType.Split);
                                 break;
 
                             case 16: // Moshpit Meg
@@ -333,22 +331,22 @@ namespace TTestCheat
                                 if (dodger == null)
                                     dodger = FindObjectOfType<Dodger_Server>();
                                 else if (dodger.HasDashAbility)
-                                    SendCommand(1);
+                                    SendCommand(CommandType.Split);
                                 break;
 
                             case 17: // Jinx
 
-                                if (GetGadgetSlots() == 8) SendCommand(1);
+                                if (GetGadgetSlots() == 8) SendCommand(CommandType.Split);
                                 break;
 
                             case 18: // Fairgrounds
 
-                                if (GetWorldZone() == UpdraftWorldZone.P7_Carnival) SendCommand(1);
+                                if (GetWorldZone() == UpdraftWorldZone.P7_Carnival) SendCommand(CommandType.Split);
                                 break;
 
                             case 19: // Zarkon 2
 
-                                if (GetGadgetSlots() == 9) SendCommand(1);
+                                if (GetGadgetSlots() == 9) SendCommand(CommandType.Split);
                                 break;
 
                             default:
@@ -367,5 +365,14 @@ namespace TTestCheat
             }
         }
 
+    }
+
+    public enum CommandType
+    {
+        Start,
+        Split,
+        Stop,
+        Pause,
+        Resume
     }
 }
