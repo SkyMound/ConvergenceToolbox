@@ -5,31 +5,52 @@ using UnityEngine;
 using System.Net.Sockets;
 using System.Text;
 using System.Collections;
+using System.IO;
+using DS.Tech.UI;
 
-namespace Tools
+namespace TTestCheat
 {
     class AutoSplit : MonoBehaviour
     {
+        string path = @"D:\enregistrements\convergence\ConvergenceToolbox\CTB_Debug.txt";
 
         private Socket _clientSocket;
         private bool _isEnabled;
+        private bool _isRunning;
+        private bool _isPaused;
+        private bool _hasStarted;
         private int _splitNumber;
         private float _refreshFrequence; // The frequence at which we check for splitting
 
         // Retrieval of the object that interest us to split at middle boss
-        readonly Hero_Server hero = FindObjectOfType<Hero_Server>(); // TW, PC, PD, TP
-        readonly PlatformerController2D_Server controller2D = FindObjectOfType<PlatformerController2D_Server>(); // Double jump
-        readonly Dodger_Server dodger = FindObjectOfType<Dodger_Server>(); // Dash
+        Hero_Server hero; // TW, PC, PD, TP
+        PlatformerController2D_Server controller2D; // Double jump
+        Dodger_Server dodger; // Dash
+        UITransitions transitions;
 
 
         public void Start()
         {
+            // This text is added only once to the file.
+            if (!File.Exists(path))
+            {
+                // Create a file to write to.
+                using (StreamWriter sw = File.CreateText(path))
+                {
+                    sw.WriteLine("ConvergenceToolbox Debugger");
+                }
+            }
+
+
+
             _refreshFrequence = 0.3f;
             _splitNumber = 0;
             _isEnabled = true;
-            StartCoroutine(CheckSplits());
+            _isPaused = false;
+            _isRunning = false;
+            _hasStarted = false;
+            StartAutoSplit();
         }
-
 
         public int GetGadgetSlots()
         {
@@ -51,6 +72,8 @@ namespace Tools
             return UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.SecondsPlayed;
         }
 
+
+
         public void StartAutoSplit()
         {
             try
@@ -61,13 +84,21 @@ namespace Tools
                 // Connect to livesplit server 
                 _clientSocket.Connect("localhost", 16834);
 
-                Console.WriteLine("Connected to the server.");
+                _isRunning = true;
 
+                using (StreamWriter sw = File.AppendText(path))
+                {
+                    sw.WriteLine("Connected to the server.");
+                }
                 StartCoroutine(CheckSplits());
+                StartCoroutine(CheckPauses());
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.ToString());
+                using (StreamWriter sw = File.AppendText(path))
+                {
+                    sw.WriteLine("Error: " + ex.ToString());
+                }
             }
         }
 
@@ -87,132 +118,236 @@ namespace Tools
             }
         }
 
-        public IEnumerator CheckSplits()
+        public void SendCommand(int commandType)
+        {
+            try
+            {
+                // Prepare the message to be sent
+                string message;
+                switch (commandType)
+                {
+                    case 0:
+                        message = "start\r\n";
+                        _splitNumber++;
+                        _hasStarted = true;
+                        break;
+                    case 1:
+                        message = "split\r\n";
+                        _splitNumber++;
+                        break;
+                    case 2:
+                        message = "stop\r\n";
+                        break;
+                    case 3:
+                        message = "pause\r\n";
+                        break;
+                    case 4:
+                        message = "resume\r\n";
+                        break;
+                    default:
+                        message = "split\r\n";
+                        break;
+
+                }
+                byte[] buffer = Encoding.ASCII.GetBytes(message);
+
+                // Send the message to the server
+                _clientSocket.Send(buffer);
+
+
+                using (StreamWriter sw = File.AppendText(path))
+                {
+                    sw.WriteLine("Succesfully send " + message);
+                }
+            }
+            catch (Exception ex)
+            {
+                using (StreamWriter sw = File.AppendText(path))
+                {
+                    sw.WriteLine("Couldn't split:" + ex.ToString());
+                }
+            }
+        }
+
+        public IEnumerator CheckPauses()
         {
             while (_isEnabled)
             {
-                if (HasToSplit())
+                if (_isRunning && _hasStarted)
                 {
-                    Split();
+                    try
+                    {
+                        if (transitions == null)
+                            transitions = FindObjectOfType<UITransitions>();
+                        if (transitions.IsVisible && !_isPaused)
+                        {
+                            _isPaused = !_isPaused;
+                            SendCommand(3);
+                        }
+                        else if (!transitions.IsVisible)
+                        {
+                            if (!PauseStack.GetInstance(NetworkCollisionLayer.None).IsPaused && _isPaused)
+                            {
+                                _isPaused = !_isPaused;
+                                SendCommand(4);
+                            }
+                            else if (PauseStack.GetInstance(NetworkCollisionLayer.None).IsPaused && !_isPaused)
+                            {
+                                _isPaused = !_isPaused;
+                                SendCommand(3);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        using (StreamWriter sw = File.AppendText(path))
+                        {
+                            sw.WriteLine("Error in update: " + ex.ToString());
+                        }
+                    }
                 }
                 yield return new WaitForSeconds(_refreshFrequence);
             }
         }
 
-        public void Split()
+        public IEnumerator CheckSplits()
         {
-            try
+            while (_isEnabled)
             {
-                // Prepare the message to be sent
-                string message = "startorsplit\r\n";
-                byte[] buffer = Encoding.ASCII.GetBytes(message);
+                try
+                {
+                    switch (_splitNumber)
+                    {
+                        case 0: // Checks if a game has just been created
 
-                // Send the message to the server
-                _clientSocket.Send(buffer);
-                _splitNumber++;
+                            if (HasLoadGame() && GetSecondsPlayed() < 1f)
+                                SendCommand(0);
+                            break;
 
-                Console.WriteLine("Message sent: " + message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error: " + ex.ToString());
+                        case 1: // Scary Janet
+
+                            if (hero == null)
+                                hero = FindObjectOfType<Hero_Server>();
+                            else if (hero.HasTimewinderAbility)
+                                SendCommand(1);
+                            break;
+
+                        case 2: // Future Ekko 1
+
+                            if (GetGadgetSlots() == 3) SendCommand(1);
+                            break;
+
+                        case 3: // Factorywood
+
+                            if (GetWorldZone() == UpdraftWorldZone.P2_Factorywood) SendCommand(1);
+                            break;
+
+
+                        case 4: // Vigilnaut
+
+                            if (hero.HasParallelConvergenceAbility) SendCommand(1);
+                            break;
+
+                        case 5: // Zarkon 1 
+
+                            if (GetGadgetSlots() == 4) SendCommand(1);
+                            break;
+
+                        case 6: // Sump sewers
+
+                            if (GetWorldZone() == UpdraftWorldZone.P3_Sump) SendCommand(1);
+                            break;
+
+                        case 7: // Drake
+
+                            if (hero.HasPhaseDiveAbility) SendCommand(1);
+                            break;
+
+                        case 8: // Warwick
+
+                            if (GetGadgetSlots() == 5) SendCommand(1);
+                            break;
+
+                        case 9: // Cultivair
+
+                            if (GetWorldZone() == UpdraftWorldZone.P4_Cultivair) SendCommand(1);
+                            break;
+
+                        case 10: // Ferros Captain
+
+                            if (controller2D == null)
+                                controller2D = FindObjectOfType<PlatformerController2D_Server>();
+                            else if (controller2D.AirJumpCount == 1)
+                                SendCommand(1);
+                            break;
+
+                        case 11: // Camille
+
+                            if (GetGadgetSlots() == 6) SendCommand(1);
+                            break;
+
+                        case 12: // Chaincrawler
+
+                            if (GetWorldZone() == UpdraftWorldZone.P5_Train) SendCommand(1);
+                            break;
+
+                        case 13: // Drake and Vale
+
+                            if (hero.HasTemporalPulseAbility) SendCommand(1);
+                            break;
+
+                        case 14: // Future Ekko 2
+
+                            if (GetGadgetSlots() == 7) SendCommand(1);
+                            break;
+
+                        case 15: // Fenlow theater
+
+                            if (GetWorldZone() == UpdraftWorldZone.P6_Theatre) SendCommand(1);
+                            break;
+
+                        case 16: // Moshpit Meg
+
+                            if (dodger == null)
+                                dodger = FindObjectOfType<Dodger_Server>();
+                            else if (dodger.HasDashAbility)
+                                SendCommand(1);
+                            break;
+
+                        case 17: // Jinx
+
+                            if (GetGadgetSlots() == 8) SendCommand(1);
+                            break;
+
+                        case 18: // Fairgrounds
+
+                            if (GetWorldZone() == UpdraftWorldZone.P7_Carnival) SendCommand(1);
+                            break;
+
+                        case 19: // Zarkon 2
+
+                            if (GetGadgetSlots() == 9) SendCommand(1);
+                            break;
+
+                        case 20: // Future Ekko 3
+                            break;
+
+                        default:
+                            break;
+                    }
+
+
+                }
+                catch (Exception ex)
+                {
+                    using (StreamWriter sw = File.AppendText(path))
+                    {
+                        sw.WriteLine("Exception when checking:" + ex.ToString());
+                    }
+                }
+                yield return new WaitForSeconds(_refreshFrequence);
             }
         }
 
-
-        public bool HasToSplit()
-        {
-            switch (_splitNumber)
-            {
-                case 0: // Checks if a game has just been created
-
-                    return HasLoadGame() && GetSecondsPlayed() < 1f;
-
-                case 1: // Scary Janet
-
-                    return hero.HasTimewinderAbility;
-
-                case 2: // Future Ekko 1
-
-                    return GetGadgetSlots() == 3;
-
-                case 3: // Factorywood
-
-                    return GetWorldZone() == UpdraftWorldZone.P2_Factorywood;
-
-                case 4: // Vigilnaut
-
-                    return hero.HasParallelConvergenceAbility;
-
-                case 5: // Zarkon 1 
-
-                    return GetGadgetSlots() == 4;
-
-                case 6: // Sump sewers
-
-                    return GetWorldZone() == UpdraftWorldZone.P3_Sump;
-
-                case 7: // Drake
-
-                    return hero.HasPhaseDiveAbility;
-
-                case 8: // Warwick
-
-                    return GetGadgetSlots() == 5;
-
-                case 9: // Cultivair
-
-                    return GetWorldZone() == UpdraftWorldZone.P4_Cultivair;
-
-                case 10: // Ferros Captain
-
-                    return controller2D.AirJumpCount == 1;
-
-                case 11: // Camille
-
-                    return GetGadgetSlots() == 6;
-
-                case 12: // Chaincrawler
-
-                    return GetWorldZone() == UpdraftWorldZone.P5_Train;
-
-                case 13: // Drake and Vale
-
-                    return hero.HasTemporalPulseAbility;
-
-                case 14: // Future Ekko 2
-
-                    return GetGadgetSlots() == 7;
-
-                case 15: // Fenlow theater
-
-                    return GetWorldZone() == UpdraftWorldZone.P6_Theatre;
-
-                case 16: // Moshpit Meg
-
-                    return dodger.HasDashAbility;
-
-                case 17: // Jinx
-
-                    return GetGadgetSlots() == 8;
-
-                case 18: // Fairgrounds
-
-                    return GetWorldZone() == UpdraftWorldZone.P7_Carnival;
-
-                case 19: // Zarkon 2
-
-                    return GetGadgetSlots() == 9;
-
-                case 20: // Future Ekko 3
-
-                    return false;
-
-                default:
-
-                    return false;
-
-            }
-        }
     }
 }
