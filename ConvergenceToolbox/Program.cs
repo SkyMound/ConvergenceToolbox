@@ -16,8 +16,6 @@ namespace ConvergenceToolbox
             string className = "ToolsLoader";
             string methodName = "Init";
 
-
-
             Injector injector = new Injector(processName);
                 
             Inject(injector, assemblyPath, @namespace, className, methodName);
