@@ -31,6 +31,23 @@ namespace Tools
         Dodger_Server dodger; // Dash
         UITransitions transitions;
 
+
+        private void OnGUI()
+        {
+            // Create a checkbox
+            _isEnabled = GUI.Toggle(new Rect(10, 10, 100, 20), _isEnabled, "Enable AutoSplit");
+
+            if(_isEnabled && !_isRunning) StartAutoSplit();
+            else (!_isEnabled && _isRunning) StopAutoSplit();
+
+            // Display the version
+            GUIStyle labelStyle = new GUIStyle(GUI.skin.label);
+            labelStyle.alignment = TextAnchor.LowerRight;
+            labelStyle.normal.textColor = Color.white;
+            GUI.Label(new Rect(Screen.width - 100, Screen.height - 20, 100, 20), "Version: " + ToolsLoader.GetVersionCTB(), labelStyle);
+        }
+
+
         public void Start()
         {
             // This text is added only once to the file.
@@ -43,15 +60,12 @@ namespace Tools
                 }
             }
 
-
-
             _refreshFrequence = 0.3f;
             _splitNumber = 0;
-            _isEnabled = true;
+            _isEnabled = false;
             _isPaused = false;
             _isRunning = false;
             _hasStarted = false;
-            StartAutoSplit();
         }
 
         public int GetGadgetSlots()
@@ -125,6 +139,8 @@ namespace Tools
                 // Close the socket
                 _clientSocket.Shutdown(SocketShutdown.Both);
                 _clientSocket.Close();
+
+                _isRunning = false;
 
                 Console.WriteLine("Connection closed.");
             }
