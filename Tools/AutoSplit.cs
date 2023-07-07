@@ -11,7 +11,7 @@ using DS.Game.Items;
 using DS.Tech.Util;
 using DS.Tech.ProjectSettings;
 
-namespace TTestCheat
+namespace Tools
 {
     class AutoSplit : MonoBehaviour
     {
@@ -146,7 +146,7 @@ namespace TTestCheat
                         message = "start\r\n";
                         _splitNumber++;
                         _hasStarted = true;
-
+                        ListenForEndOfRun();
                         break;
                     case CommandType.Split:
                         message = "split\r\n";
