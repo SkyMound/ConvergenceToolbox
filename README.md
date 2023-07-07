@@ -33,7 +33,9 @@ Now you can right click on LS&rarr;Control&rarr;Start Server.
 
 Finally, you can execute CTB. If all works well, you should see your CTB version in the down right corner.
 
-# Community Support
-Have questions, facing issues, or want to contribute ideas to make the project better? Join our Convergence Speedrun Discord server and become a part of our growing community! The server is the perfect place to seek help, share feedback, and collaborate with fellow users.
+# Contributing
 
-[Join our Discord Server](https://discord.com/invite/example)
+We highly appreciate contributions from the community! If you encounter any issues, have ideas for improvements, or simply want to ask questions, we encourage you to engage with us in the following ways.
+1. **GitHub Issues**: Feel free to open a GitHub issue in our [issue tracker](https://github.com/SkyMound/ConvergenceToolbox/issues) to report a bug, request a new feature, or provide feedback. 
+2. **Discord Community**: For more interactive discussions, assistance, or to share your ideas directly with the community, you are welcome to join our Speedrunning Discord server. Use this [invitation link](https://discord.com/invite/example) to join the server.
+
