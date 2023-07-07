@@ -38,7 +38,7 @@ namespace Tools
             _isEnabled = GUI.Toggle(new Rect(10, 10, 100, 20), _isEnabled, "Enable AutoSplit");
 
             if(_isEnabled && !_isRunning) StartAutoSplit();
-            else (!_isEnabled && _isRunning) StopAutoSplit();
+            else if(!_isEnabled && _isRunning) StopAutoSplit();
 
             // Display the version
             GUIStyle labelStyle = new GUIStyle(GUI.skin.label);
