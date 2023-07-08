@@ -34,17 +34,21 @@ namespace Tools
 
         private void OnGUI()
         {
+            GUI.Label(new Rect(10, 10, 150, 20), ToolsLoader.GetVersionCTB());
+
             // Create a checkbox
             _isEnabled = GUI.Toggle(new Rect(10, 10, 100, 20), _isEnabled, "Enable AutoSplit");
 
-            if(_isEnabled && !_isRunning) StartAutoSplit();
+            if (_isEnabled && !_isRunning)
+            {
+                using (StreamWriter sw = File.AppendText(path))
+                {
+                    sw.WriteLine("Will start auto spit");
+                }
+                StartAutoSplit();
+            }
             else if(!_isEnabled && _isRunning) StopAutoSplit();
 
-            // Display the version
-            GUIStyle labelStyle = new GUIStyle(GUI.skin.label);
-            labelStyle.alignment = TextAnchor.LowerRight;
-            labelStyle.normal.textColor = Color.white;
-            GUI.Label(new Rect(Screen.width - 100, Screen.height - 20, 100, 20), "Version: " + ToolsLoader.GetVersionCTB(), labelStyle);
         }
 
 
@@ -57,6 +61,7 @@ namespace Tools
                 using (StreamWriter sw = File.CreateText(path))
                 {
                     sw.WriteLine("ConvergenceToolbox Debugger");
+                    sw.WriteLine(ToolsLoader.GetVersionCTB());
                 }
             }
 
@@ -106,6 +111,7 @@ namespace Tools
 
         public void StartAutoSplit()
         {
+            _isRunning = true;
             try
             {
                 // Create a TCP/IP socket
@@ -114,7 +120,6 @@ namespace Tools
                 // Connect to livesplit server 
                 _clientSocket.Connect("localhost", 16834);
 
-                _isRunning = true;
 
                 using (StreamWriter sw = File.AppendText(path))
                 {
@@ -141,12 +146,17 @@ namespace Tools
                 _clientSocket.Close();
 
                 _isRunning = false;
-
-                Console.WriteLine("Connection closed.");
+                using (StreamWriter sw = File.AppendText(path))
+                {
+                    sw.WriteLine("Connection closed.");
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.ToString());
+                using (StreamWriter sw = File.AppendText(path))
+                {
+                    sw.WriteLine("Error: " + ex.ToString());
+                }
             }
         }
 
@@ -248,7 +258,7 @@ namespace Tools
         {
             while (_isEnabled)
             {
-                if(_hasStarted && _isRunning)
+                if(_isRunning)
                 {
                     try
                     {
@@ -376,8 +386,8 @@ namespace Tools
                             sw.WriteLine("Exception when checking:" + ex.ToString());
                         }
                     }
-                    yield return new WaitForSeconds(_refreshFrequence);
                 }
+                yield return new WaitForSeconds(_refreshFrequence);
             }
         }
 
