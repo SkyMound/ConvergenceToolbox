@@ -30,6 +30,8 @@ Start by executing Convergence and LiveSplit.
 
 Now you can right click on LS&rarr;Control&rarr;Start Server.
 
+You also need to import the splits template (lss file) in LiveSplit.
+
 Finally, you can execute CTB. If all works well, you should see your CTB version in the down right corner.
 
 # Contributing
