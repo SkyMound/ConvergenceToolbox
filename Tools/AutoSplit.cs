@@ -15,7 +15,7 @@ namespace Tools
 {
     class AutoSplit : MonoBehaviour
     {
-        string path = @"D:\enregistrements\convergence\ConvergenceToolbox\CTB_Debug.txt";
+        readonly string path = @"C:\Windows\Temp\CTB_Debug.txt";
 
         private Socket _clientSocket;
         private bool _isEnabled;
@@ -37,7 +37,7 @@ namespace Tools
             GUI.Label(new Rect(10, 10, 150, 20), ToolsLoader.GetVersionCTB());
 
             // Create a checkbox
-            _isEnabled = GUI.Toggle(new Rect(10, 10, 100, 20), _isEnabled, "Enable AutoSplit");
+            _isEnabled = GUI.Toggle(new Rect(10, 30, 150, 20), _isEnabled, "Enable AutoSplit");
 
             if (_isEnabled && !_isRunning)
             {
@@ -54,6 +54,7 @@ namespace Tools
 
         public void Start()
         {
+            // TODO ecresaer file
             // This text is added only once to the file.
             if (!File.Exists(path))
             {
@@ -80,7 +81,13 @@ namespace Tools
 
         public UpdraftWorldZone GetWorldZone()
         {
-            return Level.Instance.LevelData.WorldZone;
+            try
+            {
+                return Level.Instance.LevelData.WorldZone;
+            }catch
+            {
+                return UpdraftWorldZone.P0_Unknown;
+            }
         }
 
         public bool HasLoadGame()
@@ -91,6 +98,13 @@ namespace Tools
         public float GetSecondsPlayed()
         {
             return UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.SecondsPlayed;
+        }
+
+        public void RetrieveServers()
+        {
+            this.hero = FindObjectOfType<Hero_Server>();
+            this.dodger = FindObjectOfType<Dodger_Server>();
+            this.controller2D = FindObjectOfType<PlatformerController2D_Server>();
         }
 
         public void ListenForEndOfRun()
@@ -112,6 +126,7 @@ namespace Tools
         public void StartAutoSplit()
         {
             _isRunning = true;
+            _splitNumber = 0;
             try
             {
                 // Create a TCP/IP socket
@@ -125,6 +140,8 @@ namespace Tools
                 {
                     sw.WriteLine("Connected to the server.");
                 }
+
+                SBNetworkManager.Instance.Server_HeroesSpawned += this.RetrieveServers;
                 StartCoroutine(CheckSplits());
                 StartCoroutine(CheckPauses());
             }
@@ -139,13 +156,14 @@ namespace Tools
 
         public void StopAutoSplit()
         {
+            _isRunning = false;
             try
             {
                 // Close the socket
                 _clientSocket.Shutdown(SocketShutdown.Both);
                 _clientSocket.Close();
+                SBNetworkManager.Instance.Server_HeroesSpawned -= this.RetrieveServers;
 
-                _isRunning = false;
                 using (StreamWriter sw = File.AppendText(path))
                 {
                     sw.WriteLine("Connection closed.");
@@ -175,12 +193,13 @@ namespace Tools
                         ListenForEndOfRun();
                         break;
                     case CommandType.Split:
-                        message = "split\r\n";
+                        message = "resume\r\nsplit\r\n"; // In case we try to split when in pause
                         _splitNumber++;
+                        _isPaused = false;
                         break;
                     case CommandType.Stop:
                         message = "stop\r\n";
-                        _isRunning = false;
+                        _hasStarted = false;
                         break;
                     case CommandType.Pause:
                         message = "pause\r\n";
@@ -258,7 +277,8 @@ namespace Tools
         {
             while (_isEnabled)
             {
-                if(_isRunning)
+                
+                if (_isRunning)
                 {
                     try
                     {
@@ -272,10 +292,7 @@ namespace Tools
 
                             case 1: // Scary Janet
 
-                                if (hero == null)
-                                    hero = FindObjectOfType<Hero_Server>();
-                                else if (hero.HasTimewinderAbility)
-                                    SendCommand(CommandType.Split);
+                                if (hero != null && hero.HasTimewinderAbility) SendCommand(CommandType.Split);
                                 break;
 
                             case 2: // Future Ekko 1
@@ -288,10 +305,9 @@ namespace Tools
                                 if (GetWorldZone() == UpdraftWorldZone.P2_Factorywood) SendCommand(CommandType.Split);
                                 break;
 
-
                             case 4: // Vigilnaut
 
-                                if (hero.HasParallelConvergenceAbility) SendCommand(CommandType.Split);
+                                if (hero != null && hero.HasParallelConvergenceAbility) SendCommand(CommandType.Split);
                                 break;
 
                             case 5: // Zarkon 1 
@@ -306,7 +322,7 @@ namespace Tools
 
                             case 7: // Drake
 
-                                if (hero.HasPhaseDiveAbility) SendCommand(CommandType.Split);
+                                if (hero != null && hero.HasPhaseDiveAbility) SendCommand(CommandType.Split);
                                 break;
 
                             case 8: // Warwick
@@ -321,9 +337,7 @@ namespace Tools
 
                             case 10: // Ferros Captain
 
-                                if (controller2D == null)
-                                    controller2D = FindObjectOfType<PlatformerController2D_Server>();
-                                else if (controller2D.AirJumpCount == 1)
+                                if (controller2D != null && controller2D.AirJumpCount == 1)
                                     SendCommand(CommandType.Split);
                                 break;
 
@@ -339,7 +353,7 @@ namespace Tools
 
                             case 13: // Drake and Vale
 
-                                if (hero.HasTemporalPulseAbility) SendCommand(CommandType.Split);
+                                if (hero != null && hero.HasTemporalPulseAbility) SendCommand(CommandType.Split);
                                 break;
 
                             case 14: // Future Ekko 2
@@ -354,9 +368,7 @@ namespace Tools
 
                             case 16: // Moshpit Meg
 
-                                if (dodger == null)
-                                    dodger = FindObjectOfType<Dodger_Server>();
-                                else if (dodger.HasDashAbility)
+                                if (dodger != null && dodger.HasDashAbility)
                                     SendCommand(CommandType.Split);
                                 break;
 

@@ -17,7 +17,7 @@ namespace Tools
         {
             Load = new GameObject();
             Load.AddComponent<AutoSplit>();
-            UnityEngine.Object.DontDestroyOnLoad(Load);
+            GameObject.DontDestroyOnLoad(Load);
         }
 
         public static void Unload()

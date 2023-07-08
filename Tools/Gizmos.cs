@@ -12,7 +12,7 @@ namespace Tools
         //BoxCollider2D boxCollider2D;
         BoxCollider2D[] hitboxes;
         MeshCollider[] meshes;
-        string path = @"D:\enregistrements\convergence\ConvergenceToolbox\CTB_Debug.txt";
+        string path = @"C:\Windows\Temp\CTB_Debug.txt";
         void Start()
         {
             // This text is added only once to the file.

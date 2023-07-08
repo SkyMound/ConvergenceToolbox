@@ -8,7 +8,7 @@ namespace ConvergenceToolbox
     class Program
     {
 
-        private static void Main(string[] args)
+        private static void Main()
         {
             string processName = "Convergence";
             string assemblyPath = "Tools.dll";
@@ -30,7 +30,7 @@ namespace ConvergenceToolbox
             }
             catch
             {
-                System.Console.WriteLine("Could not read the file " + assemblyPath);
+                Console.WriteLine("Could not read the file " + assemblyPath);
                 return;
             }
 
@@ -45,17 +45,17 @@ namespace ConvergenceToolbox
                 }
                 catch (InjectorException ie)
                 {
-                    System.Console.WriteLine("Failed to inject assembly: " + ie);
+                    Console.WriteLine("Failed to inject assembly: " + ie);
                 }
                 catch (Exception exc)
                 {
-                    System.Console.WriteLine("Failed to inject assembly (unknown error): " + exc);
+                    Console.WriteLine("Failed to inject assembly (unknown error): " + exc);
                 }
 
                 if (remoteAssembly == IntPtr.Zero)
                     return;
 
-                System.Console.WriteLine($"{Path.GetFileName(assemblyPath)}: " + (injector.Is64Bit ? $"0x{remoteAssembly.ToInt64():X16}" : $"0x{remoteAssembly.ToInt32():X8}"));
+                Console.WriteLine($"{Path.GetFileName(assemblyPath)}: " + (injector.Is64Bit ? $"0x{remoteAssembly.ToInt64():X16}" : $"0x{remoteAssembly.ToInt32():X8}"));
             }
         }
     }

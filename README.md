@@ -8,9 +8,9 @@ ConvergenceToolbox is an open-source project dedicated to enhancing the speedrun
     - Automatic start, split and stop (Focus on your run and nothing else)
     - Synchronize with the in-game pause menu (It's good now, you can go open to the postmen)
     - Pause when loading screen (Having a wooden pc is no longer an excuse)
-- Gizmos (Checkpoint, Combat/Cutscene Trigger)
 
 ## Upcoming
+- Gizmos (Checkpoint, Combat/Cutscene Trigger)
 - Save/Checkpoint Manager
 - In-game Tips/Tricks
 - Modding
