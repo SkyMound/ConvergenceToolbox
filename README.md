@@ -1,20 +1,6 @@
 # ConvergenceToolbox
 ConvergenceToolbox is an open-source project dedicated to enhancing the speedrunning exprience of Convergence : A League of Legends Story by providing a collection of tools and utilities
 
-# Features
-
-## Implemented
-- Autosplit
-    - Automatic start, split and stop (Focus on your run and nothing else)
-    - Synchronize with the in-game pause menu (It's good now, you can go open to the postmen)
-    - Pause when loading screen (Having a wooden pc is no longer an excuse)
-
-## Upcoming
-- Gizmos (Checkpoint, Combat/Cutscene Trigger)
-- Save/Checkpoint Manager
-- In-game Tips/Tricks
-- Modding
-- Camera control
 
 # Installation
 
@@ -33,6 +19,23 @@ Now you can right click on LS&rarr;Control&rarr;Start Server.
 You also need to import the splits template (lss file) in LiveSplit.
 
 Finally, you can execute CTB. If all works well, you should see your CTB version in the down right corner.
+
+
+# Features
+
+## Implemented
+- Autosplit
+    - Automatic start, split and stop (Focus on your run and nothing else)
+    - Synchronize with the in-game pause menu (It's good now, you can go open to the postmen)
+    - Pause when loading screen (Having a wooden pc is no longer an excuse)
+
+## Upcoming
+- Gizmos (Checkpoint, Combat/Cutscene Trigger)
+- Save/Checkpoint Manager
+- In-game Tips/Tricks
+- Modding
+- Camera control
+
 
 # Contributing
 
