@@ -25,10 +25,9 @@ namespace Tools
             GameObject.Destroy(Load);
         }
 
-        public static string GetVersionCTB(){
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
-            return fileVersionInfo.ProductVersion;
+        public static string GetVersionCTB()
+        {
+            return "CTB_1.0.0";
         }
     }
 }
