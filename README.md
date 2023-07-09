@@ -1,5 +1,5 @@
 # ConvergenceToolbox
-ConvergenceToolbox is an open-source project dedicated to enhancing the speedrunning exprience of Convergence : A League of Legends Story by providing a collection of tools and utilities
+ConvergenceToolbox is an open-source project dedicated to enhancing the speedrunning experience of Convergence : A League of Legends Story by providing a collection of tools and utilities
 
 
 # Installation
@@ -18,7 +18,7 @@ Now you can right click on LS&rarr;Control&rarr;Start Server.
 
 You also need to import the splits template (lss file) in LiveSplit.
 
-Finally, you can execute CTB. If all works well, you should see your CTB version in the down right corner.
+Finally, you can execute CTB. If all works well, you should see your CTB version in the top left corner.
 
 
 # Features
