@@ -10,12 +10,15 @@ using DS.Tech.UI;
 using DS.Game.Items;
 using DS.Tech.Util;
 using DS.Tech.ProjectSettings;
+using DS.Tech.Saves;
 
 namespace Tools
 {
     class AutoSplit : MonoBehaviour
     {
         readonly string path = @"C:\Windows\Temp\CTB_Debug.txt";
+        readonly string startingDoorNode = "P1L1_TUT_Gameplay_RoomDoor_Checkpoint_GameStart";
+
 
         private Socket _clientSocket;
         private bool _isEnabled;
@@ -53,17 +56,13 @@ namespace Tools
 
 
         public void Start()
-        {
-            // TODO ecresaer file
+        {     
             // This text is added only once to the file.
-            if (!File.Exists(path))
-            {
                 // Create a file to write to.
-                using (StreamWriter sw = File.CreateText(path))
-                {
-                    sw.WriteLine("ConvergenceToolbox Debugger");
-                    sw.WriteLine(ToolsLoader.GetVersionCTB());
-                }
+            using (StreamWriter sw = File.CreateText(path))
+            {
+                sw.WriteLine("ConvergenceToolbox Debugger");
+                sw.WriteLine(ToolsLoader.GetVersionCTB());
             }
 
             _refreshFrequence = 0.3f;
@@ -72,6 +71,11 @@ namespace Tools
             _isPaused = false;
             _isRunning = false;
             _hasStarted = false;
+            using (StreamWriter sw = File.AppendText(path))
+            {
+                sw.WriteLine();
+            }
+            
         }
 
         public int GetGadgetSlots()
@@ -105,6 +109,12 @@ namespace Tools
             this.hero = FindObjectOfType<Hero_Server>();
             this.dodger = FindObjectOfType<Dodger_Server>();
             this.controller2D = FindObjectOfType<PlatformerController2D_Server>();
+        }
+
+        public void CheckNewGameIsCreated()
+        {
+            if (UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.RespawnDoorNode.name.Equals(startingDoorNode))
+                SendCommand(CommandType.Start);
         }
 
         public void ListenForEndOfRun()
@@ -142,6 +152,8 @@ namespace Tools
                 }
 
                 SBNetworkManager.Instance.Server_HeroesSpawned += this.RetrieveServers;
+                SBNetworkManager.Instance.Server_HeroesSpawned += this.CheckNewGameIsCreated;
+
                 StartCoroutine(CheckSplits());
                 StartCoroutine(CheckPauses());
             }
@@ -190,6 +202,7 @@ namespace Tools
                         message = "start\r\n";
                         _splitNumber++;
                         _hasStarted = true;
+                        SBNetworkManager.Instance.Server_HeroesSpawned -= this.CheckNewGameIsCreated;
                         ListenForEndOfRun();
                         break;
                     case CommandType.Split:
@@ -284,12 +297,6 @@ namespace Tools
                     {
                         switch (_splitNumber)
                         {
-                            case 0: // Checks if a game has just been created
-
-                                if (HasLoadGame() && GetSecondsPlayed() < 1f)
-                                    SendCommand(CommandType.Start);
-                                break;
-
                             case 1: // Scary Janet
 
                                 if (hero != null && hero.HasTimewinderAbility) SendCommand(CommandType.Split);
