@@ -27,7 +27,7 @@ namespace Tools
 
         public static string GetVersionCTB()
         {
-            return "CTB_0.1.0";
+            return "CTB_0.1.1";
         }
     }
 }

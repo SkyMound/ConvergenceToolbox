@@ -32,7 +32,9 @@ namespace Tools
         Hero_Server hero; // TW, PC, PD, TP
         PlatformerController2D_Server controller2D; // Double jump
         Dodger_Server dodger; // Dash
-        UITransitions transitions;
+
+        UITransitions transitions; // Loading screens
+        NetworkPlayerSync playerSync; // Pause Menu
 
 
         private void OnGUI()
@@ -60,7 +62,7 @@ namespace Tools
             }
 
             _refreshFrequence = 0.3f;
-            _splitNumber = 1;
+            _splitNumber = 0;
             _isEnabled = false;
             _isPaused = false;
             _isRunning = false;
@@ -89,6 +91,7 @@ namespace Tools
             this.hero = FindObjectOfType<Hero_Server>();
             this.dodger = FindObjectOfType<Dodger_Server>();
             this.controller2D = FindObjectOfType<PlatformerController2D_Server>();
+            this.playerSync = FindObjectOfType<NetworkPlayerSync>();
         }
 
         public void CheckNewGameIsCreated()
@@ -116,6 +119,7 @@ namespace Tools
         public void StartAutoSplit()
         {
             _isActive = true;
+            _isRunning = false;
             _splitNumber = 0;
             try
             {
@@ -247,12 +251,12 @@ namespace Tools
                         }
                         else if (!transitions.IsVisible)
                         {
-                            if (!PauseStack.GetInstance(NetworkCollisionLayer.None).IsPaused && _isPaused)
+                            if (!playerSync.IsPaused && _isPaused)
                             {
                                 _isPaused = !_isPaused;
                                 SendCommand(CommandType.Resume);
                             }
-                            else if (PauseStack.GetInstance(NetworkCollisionLayer.None).IsPaused && !_isPaused)
+                            else if (playerSync.IsPaused && !_isPaused)
                             {
                                 _isPaused = !_isPaused;
                                 SendCommand(CommandType.Pause);
@@ -289,82 +293,82 @@ namespace Tools
             {
                 switch (_splitNumber)
                 {
-                    case 1: // Scary Janet
+                    case 0: // Scary Janet
 
                         return hero != null && hero.HasTimewinderAbility;
 
-                    case 2: // Future Ekko 1
+                    case 1: // Future Ekko 1
 
                         return GetGadgetSlots() == 3;
 
-                    case 3: // Factorywood
+                    case 2: // Factorywood
 
                         return GetWorldZone() == UpdraftWorldZone.P2_Factorywood;
 
-                    case 4: // Vigilnaut
+                    case 3: // Vigilnaut
 
                         return hero != null && hero.HasParallelConvergenceAbility;
-                    case 5: // Zarkon 1 
+                    case 4: // Zarkon 1 
 
                         return GetGadgetSlots() == 4;
 
-                    case 6: // Sump sewers
+                    case 5: // Sump sewers
 
                         return GetWorldZone() == UpdraftWorldZone.P3_Sump;
 
-                    case 7: // Drake
+                    case 6: // Drake
 
                         return hero != null && hero.HasPhaseDiveAbility;
 
-                    case 8: // Warwick
+                    case 7: // Warwick
 
                         return GetGadgetSlots() == 5;
 
-                    case 9: // Cultivair
+                    case 8: // Cultivair
 
                         return GetWorldZone() == UpdraftWorldZone.P4_Cultivair;
-                    case 10: // Ferros Captain
+                    case 9: // Ferros Captain
 
                         return controller2D != null && controller2D.AirJumpCount == 1;
 
-                    case 11: // Camille
+                    case 10: // Camille
 
                         return GetGadgetSlots() == 6;
 
-                    case 12: // Chaincrawler
+                    case 11: // Chaincrawler
 
                         return GetWorldZone() == UpdraftWorldZone.P5_Train;
 
-                    case 13: // Drake and Vale
+                    case 12: // Drake and Vale
 
                         return hero != null && hero.HasTemporalPulseAbility;
 
-                    case 14: // Future Ekko 2
+                    case 13: // Future Ekko 2
 
                         return GetGadgetSlots() == 7;
 
-                    case 15: // Fenlow theater
+                    case 14: // Fenlow theater
 
                         return GetWorldZone() == UpdraftWorldZone.P6_Theatre;
 
-                    case 16: // Moshpit Meg
+                    case 15: // Moshpit Meg
 
                         return dodger != null && dodger.HasDashAbility;
 
-                    case 17: // Jinx
+                    case 16: // Jinx
 
                         return GetGadgetSlots() == 8;
 
-                    case 18: // Fairgrounds
+                    case 17: // Fairgrounds
 
                         return GetWorldZone() == UpdraftWorldZone.P7_Carnival;
 
-                    case 19: // Zarkon 2
+                    case 18: // Zarkon 2
 
                         return GetGadgetSlots() == 9;
 
                     default:
-                        break;
+                        return false;
                 }
             }
             catch (Exception ex)
@@ -373,6 +377,7 @@ namespace Tools
                 {
                     sw.WriteLine("Exception when checking:" + ex.ToString());
                 }
+                return false;
             }
         }
 
