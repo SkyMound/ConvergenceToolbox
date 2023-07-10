@@ -190,8 +190,14 @@ namespace Tools
                         _isPaused = false;
                         break;
                     case CommandType.Stop:
-                        message = "stop\r\n";
+                        int splitsSkipped = 20 - _splitNumber;
+                        message = "resume\r\n";
+                        for(int sk = 0; sk < splitsSkipped; sk++){
+                            message += "skipsplit\r\n";
+                        }
+                        message += "split\r\n";
                         _isRunning = false;
+                        _isPaused = false;
                         break;
                     case CommandType.Pause:
                         message = "pause\r\n";
