@@ -11,14 +11,15 @@ ConvergenceToolbox is an open-source project dedicated to enhancing the speedrun
 
 # Setup
 
-Start by executing Convergence and LiveSplit.  
-(**If you just installed LiveSplit Server**, LS Server wont appear under Control, so lets add it : go to Edit Layout&rarr;click on the '+' icon&rarr;Control&rarr;LS Server)
+1. Start by running Convergence and LiveSplit.  
 
-Now you can right click on LS&rarr;Control&rarr;Start Server.
+2. **If you just installed LiveSplit Server**, LS Server wont appear under Control, so lets add it : Right click on LS&rarr;Edit Layout&rarr;click on the '+' icon&rarr;Control&rarr;LS Server
 
-You also need to import the splits template (lss file) in LiveSplit.
+3. Right click on LS&rarr;Control&rarr;Start Server.
 
-Finally, you can execute CTB. If all works well, you should see your CTB version in the top left corner.
+4. Import the splits template (lss file) in LiveSplit.
+
+Finally, you can run CTB. If all works well, you should see your CTB version in the top left corner. (Convergence should always be up and running, before running CTB)
 
 
 # Features
