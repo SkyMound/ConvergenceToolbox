@@ -179,7 +179,7 @@ namespace Tools
                         _isPaused = false;
                         break;
                     case CommandType.Stop:
-                        int splitsSkipped = 20 - _splitNumber;
+                        int splitsSkipped = 19 - _splitNumber;
                         message = "resume\r\n";
                         for(int sk = 0; sk < splitsSkipped; sk++){
                             message += "skipsplit\r\n";
