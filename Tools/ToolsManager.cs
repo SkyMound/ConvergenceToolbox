@@ -22,6 +22,14 @@ namespace Tools
             else if (!autoSplit.isEnabled && autoSplit.isActive)
                 autoSplit.StopAutoSplit();
 
+            // Autosplit checkbox
+            gizmos.isEnabled = GUI.Toggle(new Rect(10, 50, 150, 20), gizmos.isEnabled, "Show Gizmos");
+
+            if (gizmos.isEnabled && !gizmos.isActive)
+                gizmos.UpdateGizmos();
+            else if (!gizmos.isEnabled && gizmos.isActive)
+                gizmos.UpdateGizmos();
+
         }
 
         // Use this for initialization
