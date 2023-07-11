@@ -21,8 +21,8 @@ namespace Tools
 
 
         private Socket _clientSocket;
-        private bool _isEnabled; // If the AutoSplit is enabled
-        private bool _isActive; // If the AutoSplit is running well
+        public bool isEnabled; // If the AutoSplit is enabled
+        public bool isActive; // If the AutoSplit is running well
         private bool _isPaused; // If the timer is in pause
         private bool _isRunning; // If the run has begun
         private int _splitNumber;
@@ -36,21 +36,6 @@ namespace Tools
         UITransitions transitions; // Loading screens
         NetworkPlayerSync playerSync; // Pause Menu
 
-
-        private void OnGUI()
-        {
-            GUI.Label(new Rect(10, 10, 150, 20), ToolsLoader.GetVersionCTB());
-
-            // Create a checkbox
-            _isEnabled = GUI.Toggle(new Rect(10, 30, 150, 20), _isEnabled, "Enable AutoSplit");
-
-            if (_isEnabled && !_isActive)
-                StartAutoSplit();
-            else if(!_isEnabled && _isActive) 
-                StopAutoSplit();
-
-        }
-
         public void Start()
         {     
             // This text is added only once to the file.
@@ -63,10 +48,10 @@ namespace Tools
 
             _refreshFrequence = 0.3f;
             _splitNumber = 0;
-            _isEnabled = false;
+            isEnabled = false;
             _isPaused = false;
             _isRunning = false;
-            _isActive = false;
+            isActive = false;
             
         }
 
@@ -118,7 +103,7 @@ namespace Tools
 
         public void StartAutoSplit()
         {
-            _isActive = true;
+            isActive = true;
             _isRunning = false;
             _splitNumber = 0;
             try
@@ -152,7 +137,7 @@ namespace Tools
 
         public void StopAutoSplit()
         {
-            _isActive = false;
+            isActive = false;
             try
             {
                 // Close the socket
@@ -236,9 +221,9 @@ namespace Tools
 
         public IEnumerator CheckPauses()
         {
-            while (_isEnabled)
+            while (isEnabled)
             {
-                if (_isActive && _isRunning)
+                if (isActive && _isRunning)
                 {
                     try
                     {
@@ -277,10 +262,10 @@ namespace Tools
 
         public IEnumerator CheckSplits()
         {
-            while (_isEnabled)
+            while (isEnabled)
             {
                 
-                if (_isActive && _isRunning && HasToSplit())
+                if (isActive && _isRunning && HasToSplit())
                 {
                     SendCommand(CommandType.Split);
                 }

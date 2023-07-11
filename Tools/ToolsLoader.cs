@@ -17,6 +17,8 @@ namespace Tools
         {
             Load = new GameObject();
             Load.AddComponent<AutoSplit>();
+            Load.AddComponent<Gizmos>();
+            Load.AddComponent<ToolsManager>();
             GameObject.DontDestroyOnLoad(Load);
         }
 
