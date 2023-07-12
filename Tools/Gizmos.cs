@@ -10,10 +10,13 @@ namespace Tools
 {
     public class Gizmos : MonoBehaviour
     {
-
-        //BoxCollider2D boxCollider2D;
+        // See : https://forum.unity.com/threads/cant-set-color-for-linerenderer-always-comes-out-as-magenta-or-black.968447/
         BoxCollider2D[] hitboxes;
         List<LineRenderer> lineRenderers;
+        Material mat;
+        Gradient checkpointGradient;
+        Gradient combatGradient;
+        Gradient cutsceneGradient;
         string path = @"C:\Windows\Temp\CTB_Debug.txt";
 
         public bool isEnabled;
@@ -22,6 +25,27 @@ namespace Tools
         void Start()
         {
             lineRenderers = new List<LineRenderer>();
+
+            // Set up line material and colors
+            mat = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
+
+            float alpha = 1.0f;
+            Gradient checkpointGradient = new Gradient();
+            checkpointGradient.SetKeys(
+                new GradientColorKey[] { new GradientColorKey(Color.white, 0.0f), new GradientColorKey(Color.white, 1.0f) },
+                new GradientAlphaKey[] { new GradientAlphaKey(alpha, 0.0f), new GradientAlphaKey(alpha, 1.0f) }
+            );
+            Gradient combatGradient = new Gradient();
+            combatGradient.SetKeys(
+                new GradientColorKey[] { new GradientColorKey(Color.red, 0.0f), new GradientColorKey(Color.red, 1.0f) },
+                new GradientAlphaKey[] { new GradientAlphaKey(alpha, 0.0f), new GradientAlphaKey(alpha, 1.0f) }
+            );
+            Gradient cutsceneGradient = new Gradient();
+            cutsceneGradient.SetKeys(
+                new GradientColorKey[] { new GradientColorKey(Color.green, 0.0f), new GradientColorKey(Color.green, 1.0f) },
+                new GradientAlphaKey[] { new GradientAlphaKey(alpha, 0.0f), new GradientAlphaKey(alpha, 1.0f) }
+            );
+
             // This text is added only once to the file.
             if (!File.Exists(path))
             {
@@ -35,13 +59,37 @@ namespace Tools
             
         }
 
+        LineRenderer CreateLineRenderer(BoxCollider2D hitbox, Gradient gradient){
+            LineRenderer lr = hitbox.gameObject.AddComponent<LineRenderer>();
+            lr.sortingOrder = 32000;
+            lr.alignment = LineAlignment.View;
+            lr.loop = true;
+
+            lr.startWidth = 0.08f;
+            lr.endWidth = 0.08f;
+            lr.numCornerVertices = 0;
+            Vector3[] positions = new Vector3[4];
+            lr.positionCount = positions.Length;
+            positions[0] = hitbox.bounds.center + new Vector3(hitbox.bounds.extents.x, hitbox.bounds.extents.y, 0);
+            positions[1] = hitbox.bounds.center + new Vector3(-hitbox.bounds.extents.x, hitbox.bounds.extents.y, 0);
+            positions[2] = hitbox.bounds.center + new Vector3(-hitbox.bounds.extents.x, -hitbox.bounds.extents.y, 0);
+            positions[3] = hitbox.bounds.center + new Vector3(hitbox.bounds.extents.x, -hitbox.bounds.extents.y, 0);
+
+            lr.SetPositions(positions);
+
+            lr.material = mat;
+            lr.colorGradient = gradient;
+
+            return lr;
+        }
+
         public void UpdateGizmos()
         {
             try
             {
                 using (StreamWriter sw = File.AppendText(path))
                 {
-                    sw.WriteLine(isEnabled ? "Gizmos show" : "Gizmos hide") ;
+                    sw.WriteLine(isEnabled ? "Gizmos show" : "Gizmos hide") ; // Debug
                 }
                 isActive = isEnabled;
 
@@ -49,7 +97,7 @@ namespace Tools
                 {
                     using (StreamWriter sw = File.AppendText(path))
                     {
-                        sw.WriteLine("Showing");
+                        sw.WriteLine("Showing"); // Debug
                     }
                     foreach (LineRenderer line in lineRenderers)
                     {
@@ -60,7 +108,7 @@ namespace Tools
                 {
                     using (StreamWriter sw = File.AppendText(path))
                     {
-                        sw.WriteLine("No lines");
+                        sw.WriteLine("No lines"); // Debug
                     }
                 }
             }catch(Exception ex)
@@ -80,40 +128,33 @@ namespace Tools
 
                 hitboxes = FindObjectsOfType<BoxCollider2D>();
                 lineRenderers = new List<LineRenderer>();
-                for(int i = 0; i < hitboxes.Length; i++)
+                using (StreamWriter sw = File.AppendText(path))
                 {
-                    BoxCollider2D hitbox = hitboxes[i];
-                    using (StreamWriter sw = File.AppendText(path))
+                    for(int i = 0; i < hitboxes.Length; i++)
                     {
-                        sw.WriteLine(hitbox.gameObject.name);
-                    }
-                    if(hitbox.gameObject.name.IndexOf("checkpoint", StringComparison.OrdinalIgnoreCase) >= 0)
-                    {
-                        using (StreamWriter sw = File.AppendText(path))
+                        BoxCollider2D hitbox = hitboxes[i];
+                        sw.WriteLine(hitbox.gameObject.name); // Debug
+
+                        if(hitbox.gameObject.name.IndexOf("checkpoint", StringComparison.OrdinalIgnoreCase) >= 0)
                         {
-                            sw.WriteLine("-> Saved");
+                            sw.WriteLine("-> Saved"); // Debug
+                            
+                            lineRenderers.Add(CreateLineRenderer(hitbox,checkpointGradient));
+
+                        }else if(hitbox.gameObject.name.IndexOf("room_sector", StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            sw.WriteLine("-> Saved"); // Debug
+                            
+                            lineRenderers.Add(CreateLineRenderer(hitbox,combatGradient));
+
+                        }else if(hitbox.gameObject.name.IndexOf("scene", StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            sw.WriteLine("-> Saved"); // Debug
+                            
+                            lineRenderers.Add(CreateLineRenderer(hitbox,cutsceneGradient));
+
                         }
-                        LineRenderer lineRenderer = hitbox.gameObject.AddComponent<LineRenderer>();
-                        lineRenderer.sortingOrder = 32000;
-                        lineRenderer.alignment = LineAlignment.View;
-                        lineRenderer.loop = true;
-                        Material material = lineRenderer.material;
 
-                        // Set the new color
-                        material.color = new Color(0, 0, 1);
-                        lineRenderer.startWidth = 0.08f;
-                        lineRenderer.endWidth = 0.08f;
-                        lineRenderer.numCornerVertices = 0;
-                        Vector3[] positions = new Vector3[4];
-                        lineRenderer.positionCount = positions.Length;
-                        positions[0] = hitbox.bounds.center + new Vector3(hitbox.bounds.extents.x, hitbox.bounds.extents.y, 0);
-                        positions[1] = hitbox.bounds.center + new Vector3(-hitbox.bounds.extents.x, hitbox.bounds.extents.y, 0);
-                        positions[2] = hitbox.bounds.center + new Vector3(-hitbox.bounds.extents.x, -hitbox.bounds.extents.y, 0);
-                        positions[3] = hitbox.bounds.center + new Vector3(hitbox.bounds.extents.x, -hitbox.bounds.extents.y, 0);
-
-
-                        lineRenderer.SetPositions(positions);
-                        lineRenderers.Add(lineRenderer);
                     }
 
                 }
