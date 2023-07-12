@@ -189,10 +189,13 @@ namespace Tools
                         _isPaused = false;
                         break;
                     case CommandType.Pause:
-                        message = "pause\r\n";
+                        message = "pause\r\npausegametime\r\n";
                         break;
                     case CommandType.Resume:
-                        message = "resume\r\n";
+                        message = "resume\r\nunpausegametime\r\n";
+                        break;
+                    case CommandType.GamePause:
+                        message = "pausegametime\r\n";
                         break;
                     default:
                         message = "split\r\n";
@@ -232,7 +235,7 @@ namespace Tools
                         if (transitions.IsVisible && !_isPaused)
                         {
                             _isPaused = !_isPaused;
-                            SendCommand(CommandType.Pause);
+                            SendCommand(CommandType.GamePause);
                         }
                         else if (!transitions.IsVisible)
                         {
@@ -374,6 +377,7 @@ namespace Tools
         Split,
         Stop,
         Pause,
-        Resume
+        Resume,
+        GamePause
     }
 }
