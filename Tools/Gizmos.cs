@@ -11,14 +11,15 @@ namespace Tools
     public class Gizmos : MonoBehaviour
     {
         // See : https://forum.unity.com/threads/cant-set-color-for-linerenderer-always-comes-out-as-magenta-or-black.968447/
+        readonly string path = @"C:\Windows\Temp\CTB_Debug.txt";
+        readonly Color cutsceneColor = Color.blue;
+        readonly Color checkpointColor = Color.white;
+        readonly Color combatColor = Color.red;
+
+
         BoxCollider2D[] hitboxes;
         List<LineRenderer> lineRenderers;
-        //Material mat;
         Shader shader;
-        Gradient checkpointGradient;
-        Gradient combatGradient;
-        Gradient cutsceneGradient;
-        string path = @"C:\Windows\Temp\CTB_Debug.txt";
 
         public bool isEnabled;
         public bool isActive;
@@ -40,21 +41,21 @@ namespace Tools
                     {
                         // sw.WriteLine("-> Saved"); // Debug
 
-                        lineRenderers.Add(CreateLineRenderer(hitbox, checkpointGradient));
+                        lineRenderers.Add(CreateLineRenderer(hitbox, checkpointColor));
 
                     }
                     else if (hitbox.gameObject.name.IndexOf("room_sector", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         // sw.WriteLine("-> Saved"); // Debug
 
-                        lineRenderers.Add(CreateLineRenderer(hitbox, combatGradient));
+                        lineRenderers.Add(CreateLineRenderer(hitbox, combatColor));
 
                     }
                     else if (hitbox.gameObject.name.IndexOf("scene", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         // sw.WriteLine("-> Saved"); // Debug
 
-                        lineRenderers.Add(CreateLineRenderer(hitbox, cutsceneGradient));
+                        lineRenderers.Add(CreateLineRenderer(hitbox, cutsceneColor));
 
                     }
 
@@ -102,23 +103,6 @@ namespace Tools
 
                 lineRenderers = new List<LineRenderer>();
 
-                float alpha = 1.0f;
-                checkpointGradient = new Gradient();
-                checkpointGradient.SetKeys(
-                    new GradientColorKey[] { new GradientColorKey(Color.white, 0.0f), new GradientColorKey(Color.white, 1.0f) },
-                    new GradientAlphaKey[] { new GradientAlphaKey(alpha, 0.0f), new GradientAlphaKey(alpha, 1.0f) }
-                );
-                combatGradient = new Gradient();
-                combatGradient.SetKeys(
-                    new GradientColorKey[] { new GradientColorKey(Color.red, 0.0f), new GradientColorKey(Color.red, 1.0f) },
-                    new GradientAlphaKey[] { new GradientAlphaKey(alpha, 0.0f), new GradientAlphaKey(alpha, 1.0f) }
-                );
-                cutsceneGradient = new Gradient();
-                cutsceneGradient.SetKeys(
-                    new GradientColorKey[] { new GradientColorKey(Color.green, 0.0f), new GradientColorKey(Color.green, 1.0f) },
-                    new GradientAlphaKey[] { new GradientAlphaKey(alpha, 0.0f), new GradientAlphaKey(alpha, 1.0f) }
-                );
-
                 // This text is added only once to the file.
                 if (!File.Exists(path))
                 {
@@ -139,7 +123,7 @@ namespace Tools
             
         }
 
-        LineRenderer CreateLineRenderer(BoxCollider2D hitbox, Gradient gradient){
+        LineRenderer CreateLineRenderer(BoxCollider2D hitbox, Color color){
             LineRenderer lr = hitbox.gameObject.AddComponent<LineRenderer>();
             lr.sortingOrder = 32000;
             lr.alignment = LineAlignment.View;
@@ -157,7 +141,7 @@ namespace Tools
 
             lr.SetPositions(positions);
             lr.material.shader = shader;
-            lr.material.color = Color.white;
+            lr.material.color = color;
             using (StreamWriter sw = File.AppendText(path))
             {
                 sw.WriteLine(lr.material.shader.ToString()); // Debug
