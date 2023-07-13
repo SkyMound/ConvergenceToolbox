@@ -17,18 +17,22 @@ namespace Tools
             // Autosplit checkbox
             autoSplit.isEnabled = GUI.Toggle(new Rect(10, 30, 150, 20), autoSplit.isEnabled, "Enable AutoSplit");
 
-            if (autoSplit.isEnabled && !autoSplit.isActive)
+            if (autoSplit.isEnabled && !autoSplit.isActive){
                 autoSplit.StartAutoSplit();
+                gizmos.isEnabled = false;
+                gizmos.UpdateGizmos();
+            }
             else if (!autoSplit.isEnabled && autoSplit.isActive)
                 autoSplit.StopAutoSplit();
 
-            // Autosplit checkbox
-            gizmos.isEnabled = GUI.Toggle(new Rect(10, 50, 150, 20), gizmos.isEnabled, "Show Gizmos");
+            // Gizmos checkbox
+            if(!autoSplit.isEnabled){
 
-            if (gizmos.isEnabled && !gizmos.isActive)
-                gizmos.UpdateGizmos();
-            else if (!gizmos.isEnabled && gizmos.isActive)
-                gizmos.UpdateGizmos();
+                gizmos.isEnabled = GUI.Toggle(new Rect(10, 50, 150, 20), gizmos.isEnabled, "Show Gizmos");
+
+                if (gizmos.isEnabled != gizmos.isActive)
+                    gizmos.UpdateGizmos();
+            }
 
         }
 
