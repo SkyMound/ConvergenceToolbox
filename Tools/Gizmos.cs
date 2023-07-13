@@ -29,6 +29,16 @@ namespace Tools
         {
             try
             {
+                if(shader == null){
+                    if(!RetrieveShader()){
+                        using (StreamWriter sw = File.AppendText(path))
+                        {
+                            sw.WriteLine("No shader found !");
+                        }
+                        return;
+                    }
+                }
+                    
 
                 hitboxes = FindObjectsOfType<BoxCollider2D>();
                 lineRenderers = new List<LineRenderer>();
@@ -61,6 +71,7 @@ namespace Tools
 
                 }
                 UpdateGizmos();
+
             }
             catch (Exception ex)
             {
@@ -72,39 +83,27 @@ namespace Tools
 
         }
 
-        void RetrieveShader(){
-            if(shader==null){
-                MeshRenderer[] mesh = FindObjectsOfType<MeshRenderer>();
-                shader = mesh[0].material.shader;
-                using (StreamWriter sw = File.AppendText(path))
+        bool RetrieveShader(){
+            MeshRenderer[] mesh = FindObjectsOfType<MeshRenderer>();
+            using (StreamWriter sw = File.AppendText(path))
+            {
+                for(int i = 0; i < mesh.Length; i++)
                 {
-                    for(int i = 0; i < mesh.Length; i++)
+                    sw.WriteLine(mesh[i].material.shader.ToString());
+                    if (mesh[i].material.shader.ToString().IndexOf("unlit", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
-                        sw.WriteLine(mesh[i].material.shader.ToString());
-                        if (mesh[i].material.shader.ToString().IndexOf("unlit", StringComparison.OrdinalIgnoreCase) >= 0)
-                        {
-                            shader = mesh[i].material.shader;
-                        }
+                        shader = mesh[i].material.shader;
                     }
                 }
             }
+
+            return shader != null;
         }
 
         void Start()
         {
             try
             {
-                shader = Shader.Find("Shader Graphs/Halftones_Unlit");
-                using (StreamWriter sw = File.AppendText(path))
-                {
-                    sw.WriteLine(shader.name);
-                    sw.WriteLine(shader.ToString());
-                }
-                
-                /*
-                
-                */
-                
                 SBNetworkManager.Instance.Server_HeroesSpawned += this.SetupHitbox;
 
                 lineRenderers = new List<LineRenderer>();
