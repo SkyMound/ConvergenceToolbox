@@ -72,18 +72,8 @@ namespace Tools
 
         }
 
-        void Start()
-        {
-            try
-            {
-                shader = Shader.Find("Shader Graphs/Halftones_Unlit");
-                using (StreamWriter sw = File.AppendText(path))
-                {
-                    sw.WriteLine(shader.name);
-                    sw.WriteLine(shader.ToString());
-                }
-                
-                /*
+        void RetrieveShader(){
+            if(shader==null){
                 MeshRenderer[] mesh = FindObjectsOfType<MeshRenderer>();
                 shader = mesh[0].material.shader;
                 using (StreamWriter sw = File.AppendText(path))
@@ -97,6 +87,22 @@ namespace Tools
                         }
                     }
                 }
+            }
+        }
+
+        void Start()
+        {
+            try
+            {
+                shader = Shader.Find("Shader Graphs/Halftones_Unlit");
+                using (StreamWriter sw = File.AppendText(path))
+                {
+                    sw.WriteLine(shader.name);
+                    sw.WriteLine(shader.ToString());
+                }
+                
+                /*
+                
                 */
                 
                 SBNetworkManager.Instance.Server_HeroesSpawned += this.SetupHitbox;
