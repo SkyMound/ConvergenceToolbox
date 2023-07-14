@@ -4,7 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UIElements;
+using static UnityEngine.Rendering.DebugUI;
 
 namespace Tools
 {
@@ -14,19 +16,21 @@ namespace Tools
         readonly string path = @"C:\Windows\Temp\CTB_Debug.txt";
         readonly Color cutsceneColor = Color.blue;
         readonly Color checkpointColor = Color.white;
-        readonly Color combatColor = Color.red;
+        readonly Color roomDoorColor = Color.green;
+        readonly Color battleColor = Color.red;
 
-
+        Battle_Server[] battleServers;
         BoxCollider2D[] hitboxes;
         List<LineRenderer> lineRenderers;
         Shader shader;
+        
 
         public bool isEnabled;
         public bool isActive;
 
-
         void SetupHitbox()
         {
+            
             try
             {
                 if(shader == null){
@@ -39,36 +43,39 @@ namespace Tools
                     }
                 }
                     
+                lineRenderers = new List<LineRenderer>();
+                battleServers = FindObjectsOfType<Battle_Server>(); 
+
+                foreach(Battle_Server battle in battleServers)
+                {
+                    lineRenderers.Add(CreateLineRenderer(battle.gameObject, battle.NetworkBattle.GetTriggerBounds(), battleColor));
+                }
+
 
                 hitboxes = FindObjectsOfType<BoxCollider2D>();
-                lineRenderers = new List<LineRenderer>();
-                for (int i = 0; i < hitboxes.Length; i++)
+                using (StreamWriter sw = File.AppendText(path))
                 {
-                    BoxCollider2D hitbox = hitboxes[i];
-                    //sw.WriteLine(hitbox.gameObject.name); // Debug
-
-                    if (hitbox.gameObject.name.IndexOf("checkpoint", StringComparison.OrdinalIgnoreCase) >= 0)
+                    for (int i = 0; i < hitboxes.Length; i++)
                     {
-                        // sw.WriteLine("-> Saved"); // Debug
+                        BoxCollider2D hitbox = hitboxes[i];
+                        if (hitbox.gameObject.name.IndexOf("checkpoint", StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
 
-                        lineRenderers.Add(CreateLineRenderer(hitbox, checkpointColor));
+                            lineRenderers.Add(CreateLineRenderer(hitbox.gameObject,hitbox.bounds, checkpointColor));
 
+                        }
+                        else if (hitbox.gameObject.name.IndexOf("cutscene", StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+
+                            lineRenderers.Add(CreateLineRenderer(hitbox.gameObject, hitbox.bounds, cutsceneColor));
+
+                        }else if(hitbox.gameObject.name.IndexOf("roomdoor", StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+
+                            lineRenderers.Add(CreateLineRenderer(hitbox.gameObject, hitbox.bounds, roomDoorColor));
+                            
+                        }
                     }
-                    else if (hitbox.gameObject.name.IndexOf("room_sector", StringComparison.OrdinalIgnoreCase) >= 0)
-                    {
-                        // sw.WriteLine("-> Saved"); // Debug
-
-                        lineRenderers.Add(CreateLineRenderer(hitbox, combatColor));
-
-                    }
-                    else if (hitbox.gameObject.name.IndexOf("scene", StringComparison.OrdinalIgnoreCase) >= 0)
-                    {
-                        // sw.WriteLine("-> Saved"); // Debug
-
-                        lineRenderers.Add(CreateLineRenderer(hitbox, cutsceneColor));
-
-                    }
-
                 }
                 UpdateGizmos();
 
@@ -84,15 +91,18 @@ namespace Tools
         }
 
         bool RetrieveShader(){
+
             MeshRenderer[] mesh = FindObjectsOfType<MeshRenderer>();
             using (StreamWriter sw = File.AppendText(path))
             {
                 for(int i = 0; i < mesh.Length; i++)
                 {
-                    sw.WriteLine(mesh[i].material.shader.ToString());
-                    if (mesh[i].material.shader.ToString().IndexOf("unlit", StringComparison.OrdinalIgnoreCase) >= 0)
+                    // if (mesh[i].material.shader.ToString().IndexOf("Halftones_Unlit", StringComparison.OrdinalIgnoreCase) >= 0) // Cant change his color
+                    if (mesh[i].material.shader.ToString().IndexOf("Flat", StringComparison.OrdinalIgnoreCase) >= 0 || mesh[i].material.shader.ToString().IndexOf("Color", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         shader = mesh[i].material.shader;
+                        sw.WriteLine("Found : "+shader.name);
+                        
                     }
                 }
             }
@@ -104,6 +114,7 @@ namespace Tools
         {
             try
             {
+                RetrieveShader();
                 SBNetworkManager.Instance.Server_HeroesSpawned += this.SetupHitbox;
 
                 lineRenderers = new List<LineRenderer>();
@@ -128,8 +139,8 @@ namespace Tools
             
         }
 
-        LineRenderer CreateLineRenderer(BoxCollider2D hitbox, Color color){
-            LineRenderer lr = hitbox.gameObject.AddComponent<LineRenderer>();
+        LineRenderer CreateLineRenderer(GameObject boundsContainer, Bounds bounds, Color color){
+            LineRenderer lr = boundsContainer.AddComponent<LineRenderer>();
             lr.sortingOrder = 32000;
             lr.alignment = LineAlignment.View;
             lr.loop = true;
@@ -139,18 +150,14 @@ namespace Tools
             lr.numCornerVertices = 0;
             Vector3[] positions = new Vector3[4];
             lr.positionCount = positions.Length;
-            positions[0] = hitbox.bounds.center + new Vector3(hitbox.bounds.extents.x, hitbox.bounds.extents.y, 0);
-            positions[1] = hitbox.bounds.center + new Vector3(-hitbox.bounds.extents.x, hitbox.bounds.extents.y, 0);
-            positions[2] = hitbox.bounds.center + new Vector3(-hitbox.bounds.extents.x, -hitbox.bounds.extents.y, 0);
-            positions[3] = hitbox.bounds.center + new Vector3(hitbox.bounds.extents.x, -hitbox.bounds.extents.y, 0);
+            positions[0] = bounds.center + new Vector3(bounds.extents.x, bounds.extents.y, 0);
+            positions[1] = bounds.center + new Vector3(-bounds.extents.x, bounds.extents.y, 0);
+            positions[2] = bounds.center + new Vector3(-bounds.extents.x, -bounds.extents.y, 0);
+            positions[3] = bounds.center + new Vector3(bounds.extents.x, -bounds.extents.y, 0);
 
             lr.SetPositions(positions);
             lr.material.shader = shader;
             lr.material.color = color;
-            using (StreamWriter sw = File.AppendText(path))
-            {
-                sw.WriteLine(lr.material.shader.ToString()); // Debug
-            }
 
             return lr;
         }
