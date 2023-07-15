@@ -12,7 +12,6 @@ namespace Tools
 {
     public class Gizmos : MonoBehaviour
     {
-        // See : https://forum.unity.com/threads/cant-set-color-for-linerenderer-always-comes-out-as-magenta-or-black.968447/
         readonly string path = @"C:\Windows\Temp\CTB_Debug.txt";
         readonly Color cutsceneColor = Color.blue;
         readonly Color checkpointColor = Color.white;
@@ -27,58 +26,51 @@ namespace Tools
 
         public bool isEnabled;
         public bool isActive;
+        public bool hasCreatedLine;
 
         void SetupHitbox()
         {
-            
+            hasCreatedLine = false;
             try
             {
-                if(shader == null){
-                    if(!RetrieveShader()){
-                        using (StreamWriter sw = File.AppendText(path))
-                        {
-                            sw.WriteLine("No shader found !");
-                        }
+                if (shader == null)
+                    if(!RetrieveShader())
                         return;
-                    }
-                }
-                    
-                lineRenderers = new List<LineRenderer>();
-                battleServers = FindObjectsOfType<Battle_Server>(); 
 
-                foreach(Battle_Server battle in battleServers)
+                if (!isEnabled)
+                    return;
+
+                lineRenderers = new List<LineRenderer>();
+                battleServers = FindObjectsOfType<Battle_Server>();
+                hitboxes = FindObjectsOfType<BoxCollider2D>();
+
+                foreach (Battle_Server battle in battleServers)
                 {
                     lineRenderers.Add(CreateLineRenderer(battle.gameObject, battle.NetworkBattle.GetTriggerBounds(), battleColor));
                 }
 
-
-                hitboxes = FindObjectsOfType<BoxCollider2D>();
-                using (StreamWriter sw = File.AppendText(path))
+                for (int i = 0; i < hitboxes.Length; i++)
                 {
-                    for (int i = 0; i < hitboxes.Length; i++)
+                    BoxCollider2D hitbox = hitboxes[i];
+                    if (hitbox.gameObject.name.IndexOf("checkpoint", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
-                        BoxCollider2D hitbox = hitboxes[i];
-                        if (hitbox.gameObject.name.IndexOf("checkpoint", StringComparison.OrdinalIgnoreCase) >= 0)
-                        {
 
-                            lineRenderers.Add(CreateLineRenderer(hitbox.gameObject,hitbox.bounds, checkpointColor));
+                        lineRenderers.Add(CreateLineRenderer(hitbox.gameObject,hitbox.bounds, checkpointColor));
 
-                        }
-                        else if (hitbox.gameObject.name.IndexOf("cutscene", StringComparison.OrdinalIgnoreCase) >= 0)
-                        {
+                    }
+                    else if (hitbox.gameObject.name.IndexOf("cutscene", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
 
-                            lineRenderers.Add(CreateLineRenderer(hitbox.gameObject, hitbox.bounds, cutsceneColor));
+                        lineRenderers.Add(CreateLineRenderer(hitbox.gameObject, hitbox.bounds, cutsceneColor));
 
-                        }else if(hitbox.gameObject.name.IndexOf("roomdoor", StringComparison.OrdinalIgnoreCase) >= 0)
-                        {
+                    }else if(hitbox.gameObject.name.IndexOf("roomdoor", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
 
-                            lineRenderers.Add(CreateLineRenderer(hitbox.gameObject, hitbox.bounds, roomDoorColor));
+                        lineRenderers.Add(CreateLineRenderer(hitbox.gameObject, hitbox.bounds, roomDoorColor));
                             
-                        }
                     }
                 }
-                UpdateGizmos();
-
+                hasCreatedLine = true;
             }
             catch (Exception ex)
             {
@@ -97,27 +89,34 @@ namespace Tools
             {
                 for(int i = 0; i < mesh.Length; i++)
                 {
-                    // if (mesh[i].material.shader.ToString().IndexOf("Halftones_Unlit", StringComparison.OrdinalIgnoreCase) >= 0) // Cant change his color
-                    if (mesh[i].material.shader.ToString().IndexOf("Flat", StringComparison.OrdinalIgnoreCase) >= 0 || mesh[i].material.shader.ToString().IndexOf("Color", StringComparison.OrdinalIgnoreCase) >= 0)
+                    sw.WriteLine(mesh[i].material.shader.name);
+
+                    if (mesh[i].material.shader.ToString().IndexOf("Flat", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                        mesh[i].material.shader.ToString().IndexOf("Color", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                        mesh[i].material.shader.ToString().IndexOf("Sprites/Default", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         shader = mesh[i].material.shader;
                         sw.WriteLine("Found : "+shader.name);
-                        
+                        return true;
                     }
                 }
             }
-
-            return shader != null;
+            using (StreamWriter sw = File.AppendText(path))
+            {
+                sw.WriteLine("No shader found !");
+            }
+            return false;
         }
 
         void Start()
         {
+            lineRenderers = new List<LineRenderer>();
+            hasCreatedLine = false;
             try
             {
                 RetrieveShader();
                 SBNetworkManager.Instance.Server_HeroesSpawned += this.SetupHitbox;
 
-                lineRenderers = new List<LineRenderer>();
 
                 // This text is added only once to the file.
                 if (!File.Exists(path))
@@ -132,7 +131,7 @@ namespace Tools
             {
                 using (StreamWriter sw = File.AppendText(path))
                 {
-                    sw.WriteLine("Error at start : " + ex.ToString());
+                    sw.WriteLine("Error at Gizmos start : " + ex.ToString());
                 }
             }
             
@@ -145,8 +144,8 @@ namespace Tools
             lr.alignment = LineAlignment.View;
             lr.loop = true;
 
-            lr.startWidth = 0.08f;
-            lr.endWidth = 0.08f;
+            lr.startWidth = 0.07f;
+            lr.endWidth = 0.07f;
             lr.numCornerVertices = 0;
             Vector3[] positions = new Vector3[4];
             lr.positionCount = positions.Length;
@@ -164,35 +163,28 @@ namespace Tools
 
         public void UpdateGizmos()
         {
-            try
+            using (StreamWriter sw = File.AppendText(path))
+            {
+                sw.WriteLine(isEnabled ? "Show Gizmos" : "Hide Gizmos"); // Debug
+            }
+
+            isActive = isEnabled;
+
+            if (isEnabled && !hasCreatedLine)
+                SetupHitbox();
+
+            if (lineRenderers.Count != 0)
+            {
+                foreach (LineRenderer line in lineRenderers)
+                {
+                    line.enabled = isEnabled;
+                }
+            }
+            else
             {
                 using (StreamWriter sw = File.AppendText(path))
                 {
-                    sw.WriteLine(isEnabled ? "Gizmos show" : "Gizmos hide") ; // Debug
-                }
-                isActive = isEnabled;
-
-                if (lineRenderers.Count != 0)
-                {
-                    foreach (LineRenderer line in lineRenderers)
-                    {
-                        line.enabled = isEnabled;
-
-                        //sw.WriteLine("Showing"+ line.ToString()); // Debug
-                    }
-                }
-                else
-                {
-                    using (StreamWriter sw = File.AppendText(path))
-                    {
-                        sw.WriteLine("No lines"); // Debug
-                    }
-                }
-            }catch(Exception ex)
-            {
-                using (StreamWriter sw = File.AppendText(path))
-                {
-                    sw.WriteLine("Error when updating gizmos : " + ex.ToString());
+                    sw.WriteLine("Can't display !"); // Debug
                 }
             }
         }
