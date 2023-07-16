@@ -1,12 +1,12 @@
 # ConvergenceToolbox
-ConvergenceToolbox is an open-source add-on dedicated to enhancing the speedrunning experience of Convergence : A League of Legends Story by providing a collection of tools and utilities
+Convergence Toolbox (CTB) is an open-source add-on dedicated to enhancing the speedrunning experience of Convergence : A League of Legends Story by providing a collection of tools and utilities
 
 
 # Installation
 
 - Download `ConvergenceToolbox.zip` right [here](https://github.com/SkyMound/ConvergenceToolbox/releases) and extract it.
 - Download LiveSplit [here](https://livesplit.org/downloads/).
-- Download LiveSplit Server [here](https://github.com/LiveSplit/LiveSplit.Server/releases) and place the content of this zip into "LiveSplit/Components".
+- Download `LiveSplit.Server.zip` [here](https://github.com/LiveSplit/LiveSplit.Server/releases) and place the content of this zip into "LiveSplit/Components".
 
 
 # Setup
