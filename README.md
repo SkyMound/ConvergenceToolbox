@@ -11,27 +11,34 @@ ConvergenceToolbox is an open-source project dedicated to enhancing the speedrun
 
 # Setup
 
-1. Start by running Convergence and LiveSplit.  
+Let's now see how to setup the Autsplit with LiveSplit.
 
-2. **If you just installed LiveSplit Server**, LS Server wont appear under Control, so lets add it : Right click on LS&rarr;Edit Layout&rarr;click on the '+' icon&rarr;Control&rarr;LS Server
+1. Run LiveSplit.  
 
-3. Right click on LS&rarr;Control&rarr;Start Server.
+2. Right click on LS&rarr;Open Splits&rarr;From File...&rarr;Select 'Splits_CTB.lss'
 
-4. Import the splits template (lss file) in LiveSplit.
+3. Right click on LS&rarr;Open Layout&rarr;From File...&rarr;Select 'Layout_CTB.lsl'
 
-Finally, you can run CTB. If all works well, you should see your CTB version in the top left corner. (Convergence should always be up and running, before running CTB)
+4. Right click on LS&rarr;Control&rarr;Start Server
 
+5. Run Convergence. Wait until you're on the main menu.
+
+6. Run CTB, you should see your CTB version in the top left corner. Check 'Enable AutoSplit' and start a new game.
+
+>**Note**
+>For all the other tools except Autosplit, you just need Convergence to be up and running before running CTB.
 
 # Features
 
 ## Implemented
 - Autosplit
     - Automatic start, split and stop (Focus on your run and nothing else)
+    - Handle Real Time (with loads) and Game Time (without loads) (Having a wooden pc is no longer an excuse)
     - Synchronize with the in-game pause menu (It's good now, you can go open to the postmen)
-    - Pause when loading screen (Having a wooden pc is no longer an excuse)
+- Gizmos 
+    - Hitbox trigger for Checkpoint, Battle, Cutscene and Level Loader
 
 ## Upcoming
-- Gizmos (Checkpoint, Combat/Cutscene Trigger)
 - Save/Checkpoint Manager
 - In-game Tips/Tricks
 - Modding
