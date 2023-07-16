@@ -1,12 +1,12 @@
 # ConvergenceToolbox
-ConvergenceToolbox is an open-source project dedicated to enhancing the speedrunning experience of Convergence : A League of Legends Story by providing a collection of tools and utilities
+ConvergenceToolbox is an open-source add-on dedicated to enhancing the speedrunning experience of Convergence : A League of Legends Story by providing a collection of tools and utilities
 
 
 # Installation
 
-- Download CTB binaries right [here](https://github.com/SkyMound/ConvergenceToolbox/releases)
-- Download LiveSplit [here](https://livesplit.org/downloads/)
-- Download LiveSplit Server [here](https://github.com/LiveSplit/LiveSplit.Server/releases) and place the content of this zip into "LiveSplit/Components"
+- Download `ConvergenceToolbox.zip` right [here](https://github.com/SkyMound/ConvergenceToolbox/releases) and extract it.
+- Download LiveSplit [here](https://livesplit.org/downloads/).
+- Download LiveSplit Server [here](https://github.com/LiveSplit/LiveSplit.Server/releases) and place the content of this zip into "LiveSplit/Components".
 
 
 # Setup
@@ -15,15 +15,15 @@ Let's now see how to setup the Autsplit with LiveSplit.
 
 1. Run LiveSplit.  
 
-2. Right click on LS&rarr;Open Splits&rarr;From File...&rarr;Select 'Splits_CTB.lss'
+2. Right click on LS&rarr;Open Splits&rarr;From File...&rarr;Select `Splits_CTB.lss`
 
-3. Right click on LS&rarr;Open Layout&rarr;From File...&rarr;Select 'Layout_CTB.lsl'
+3. Right click on LS&rarr;Open Layout&rarr;From File...&rarr;Select `Layout_CTB.lsl`
 
 4. Right click on LS&rarr;Control&rarr;Start Server
 
 5. Run Convergence. Wait until you're on the main menu.
 
-6. Run CTB, you should see your CTB version in the top left corner of Convergence. Check 'Enable AutoSplit' and start a new game.
+6. Run `ConvergenceToolbox.exe`, you should see your CTB version in the top left corner of Convergence. Check `Enable AutoSplit` and start a new game.
 
 >**Note**
 >For all the other tools except Autosplit, you just need Convergence to be up and running before running CTB.
