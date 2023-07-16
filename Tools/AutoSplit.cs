@@ -168,7 +168,7 @@ namespace Tools
                 switch (type)
                 {
                     case CommandType.Start:
-                        message = "start\r\n";
+                        message = "starttimer\r\n";
                         _isRunning = true;
                         SBNetworkManager.Instance.Server_HeroesSpawned -= this.CheckNewGameIsCreated;
                         ListenForEndOfRun();
