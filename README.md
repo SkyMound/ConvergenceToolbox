@@ -23,7 +23,7 @@ Let's now see how to setup the Autsplit with LiveSplit.
 
 5. Run Convergence. Wait until you're on the main menu.
 
-6. Run CTB, you should see your CTB version in the top left corner. Check 'Enable AutoSplit' and start a new game.
+6. Run CTB, you should see your CTB version in the top left corner of Convergence. Check 'Enable AutoSplit' and start a new game.
 
 >**Note**
 >For all the other tools except Autosplit, you just need Convergence to be up and running before running CTB.
