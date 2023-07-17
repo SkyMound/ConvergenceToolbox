@@ -15,7 +15,7 @@ Let's now see how to setup the Autsplit with LiveSplit.
 
 1. Run LiveSplit.  
 
-2. Right click on LS&rarr;Open Splits&rarr;From File...&rarr;Select `Splits_CTB.lss`
+2. Right click on LS&rarr;Open Splits&rarr;From File...&rarr;Select `Splits_Any%_CTB.lss`
 
 3. Right click on LS&rarr;Open Layout&rarr;From File...&rarr;Select `Layout_CTB.lsl`
 
