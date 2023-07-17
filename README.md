@@ -32,11 +32,10 @@ Let's now see how to setup the Autsplit with LiveSplit.
 
 ## Implemented
 - Autosplit
-    - Automatic start, split and stop (Focus on your run and nothing else)
-    - Handle Real Time (with loads) and Game Time (without loads) (Having a wooden pc is no longer an excuse)
-    - Synchronize with the in-game pause menu (It's good now, you can go open to the postmen)
+    - Automatic start, split and stop.
+    - Handles RTA (start to end no pauses at all) and IGT (without loads, menu pauses) timers.
 - Gizmos 
-    - Hitbox trigger for Checkpoint, Battle, Cutscene and Level Loader
+    - Hitbox trigger for Checkpoint, Battle, Cutscene and Level Loader.
 
 ## Upcoming
 - Save/Checkpoint Manager

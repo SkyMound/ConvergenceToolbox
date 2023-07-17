@@ -174,27 +174,21 @@ namespace Tools
                         ListenForEndOfRun();
                         break;
                     case CommandType.Split:
-                        message = "resume\r\nsplit\r\n"; // In case we try to split when in pause
+                        message = "split\r\n";
                         _splitNumber++;
-                        _isPaused = false;
                         break;
                     case CommandType.Stop:
                         int splitsSkipped = 19 - _splitNumber;
-                        message = "resume\r\n";
                         for(int sk = 0; sk < splitsSkipped; sk++){
                             message += "skipsplit\r\n";
                         }
                         message += "split\r\n";
                         _isRunning = false;
-                        _isPaused = false;
-                        break;
-                    case CommandType.Pause:
-                        message = "pause\r\npausegametime\r\n";
                         break;
                     case CommandType.Resume:
-                        message = "resume\r\nunpausegametime\r\n";
+                        message = "unpausegametime\r\n";
                         break;
-                    case CommandType.GamePause:
+                    case CommandType.Pause:
                         message = "pausegametime\r\n";
                         break;
                     default:
@@ -235,7 +229,7 @@ namespace Tools
                         if (transitions.IsVisible && !_isPaused)
                         {
                             _isPaused = !_isPaused;
-                            SendCommand(CommandType.GamePause);
+                            SendCommand(CommandType.Pause);
                         }
                         else if (!transitions.IsVisible)
                         {
@@ -377,7 +371,6 @@ namespace Tools
         Split,
         Stop,
         Pause,
-        Resume,
-        GamePause
+        Resume
     }
 }
