@@ -54,6 +54,7 @@ namespace Tools
             _isRunning = false;
             isActive = false;
             endOfRunListener = new ItemAmountChanged(this.CheckFutureEkko3Defeated);
+            
         }
 
         public int GetGadgetSlots()
@@ -120,12 +121,14 @@ namespace Tools
                     sw.WriteLine("Connected to the server.");
                 }
 
-                SBNetworkManager.Instance.Server_HeroesSpawned += this.RetrieveServers;
-                SBNetworkManager.Instance.Server_HeroesSpawned += this.CheckNewGameIsCreated;
-                UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.MergedInventoryStacker.ItemAmountChanged += endOfRunListener;
-
                 StartCoroutine(CheckSplits());
                 StartCoroutine(CheckPauses());
+
+                SBNetworkManager.Instance.Server_HeroesSpawned += this.RetrieveServers;
+                SBNetworkManager.Instance.Server_HeroesSpawned += this.CheckNewGameIsCreated;
+                
+
+                
             }
             catch (Exception ex)
             {
@@ -148,7 +151,7 @@ namespace Tools
 
                 SBNetworkManager.Instance.Server_HeroesSpawned -= this.RetrieveServers;
                 SBNetworkManager.Instance.Server_HeroesSpawned -= this.CheckNewGameIsCreated;
-                UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.MergedInventoryStacker.ItemAmountChanged -= endOfRunListener;
+                
 
                 using (StreamWriter sw = File.AppendText(path))
                 {
@@ -173,11 +176,15 @@ namespace Tools
                 switch (type)
                 {
                     case CommandType.Restart:
-                        message = "reset\r\n";
+                        message = "reset\r\nstarttimer\r\n";
+                        _splitNumber = 0;
+                        _isRunning = true;
+                        break;
                     case CommandType.Start:
                         message += "starttimer\r\n";
                         _splitNumber = 0;
                         _isRunning = true;
+                        UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.MergedInventoryStacker.ItemAmountChanged += this.endOfRunListener;
                         break;
                     case CommandType.Split:
                         message = "split\r\n";
@@ -190,6 +197,7 @@ namespace Tools
                         }
                         message += "split\r\n";
                         _isRunning = false;
+                        UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.MergedInventoryStacker.ItemAmountChanged -= endOfRunListener;
                         break;
                     case CommandType.Resume:
                         message = "unpausegametime\r\n";
