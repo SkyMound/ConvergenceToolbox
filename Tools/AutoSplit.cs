@@ -35,6 +35,7 @@ namespace Tools
 
         UITransitions transitions; // Loading screens
         NetworkPlayerSync playerSync; // Pause Menu
+        ItemAmountChanged endOfRunListener;
 
         public void Start()
         {     
@@ -52,7 +53,7 @@ namespace Tools
             _isPaused = false;
             _isRunning = false;
             isActive = false;
-            
+            endOfRunListener = new ItemAmountChanged(this.CheckFutureEkko3Defeated);
         }
 
         public int GetGadgetSlots()
@@ -81,20 +82,19 @@ namespace Tools
 
         public void CheckNewGameIsCreated()
         {
-            if (UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.RespawnDoorNode.name.Equals(startingDoorNode))
-                SendCommand(CommandType.Start);
-        }
-
-        public void ListenForEndOfRun()
-        {
-            UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.MergedInventoryStacker.ItemAmountChanged += new ItemAmountChanged(this.CheckFutureEkko3Defeated);
+            if (UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.RespawnDoorNode.name.Equals(startingDoorNode)){
+                if(_isRunning)
+                    SendCommand(CommandType.Restart);
+                else
+                    SendCommand(CommandType.Start);
+            }
         }
 
         public void CheckFutureEkko3Defeated(UnityGuid itemID, int oldAmount, int newAmount)
         {
             if (!itemID.IsValid() || newAmount <= oldAmount)
                 return;
-            if(itemID == Configuration<AchievementConfig>.Instance.Asset.FutureEkko3DefeatedItemID)
+            if(_isRunning && itemID == Configuration<AchievementConfig>.Instance.Asset.FutureEkko3DefeatedItemID)
             {
                 SendCommand(CommandType.Stop);
             }
@@ -105,7 +105,7 @@ namespace Tools
         {
             isActive = true;
             _isRunning = false;
-            _splitNumber = 0;
+            
             try
             {
                 // Create a TCP/IP socket
@@ -122,6 +122,7 @@ namespace Tools
 
                 SBNetworkManager.Instance.Server_HeroesSpawned += this.RetrieveServers;
                 SBNetworkManager.Instance.Server_HeroesSpawned += this.CheckNewGameIsCreated;
+                UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.MergedInventoryStacker.ItemAmountChanged += endOfRunListener;
 
                 StartCoroutine(CheckSplits());
                 StartCoroutine(CheckPauses());
@@ -138,12 +139,16 @@ namespace Tools
         public void StopAutoSplit()
         {
             isActive = false;
+            _isRunning = false;
             try
             {
                 // Close the socket
                 _clientSocket.Shutdown(SocketShutdown.Both);
                 _clientSocket.Close();
+
                 SBNetworkManager.Instance.Server_HeroesSpawned -= this.RetrieveServers;
+                SBNetworkManager.Instance.Server_HeroesSpawned -= this.CheckNewGameIsCreated;
+                UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.MergedInventoryStacker.ItemAmountChanged -= endOfRunListener;
 
                 using (StreamWriter sw = File.AppendText(path))
                 {
@@ -164,14 +169,15 @@ namespace Tools
             try
             {
                 // Prepare the message to be sent
-                string message;
+                string message = "";
                 switch (type)
                 {
+                    case CommandType.Restart:
+                        message = "reset\r\n";
                     case CommandType.Start:
-                        message = "starttimer\r\n";
+                        message += "starttimer\r\n";
+                        _splitNumber = 0;
                         _isRunning = true;
-                        SBNetworkManager.Instance.Server_HeroesSpawned -= this.CheckNewGameIsCreated;
-                        ListenForEndOfRun();
                         break;
                     case CommandType.Split:
                         message = "split\r\n";
@@ -371,6 +377,7 @@ namespace Tools
         Split,
         Stop,
         Pause,
-        Resume
+        Resume,
+        Restart
     }
 }
