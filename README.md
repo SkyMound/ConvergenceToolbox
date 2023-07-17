@@ -5,7 +5,7 @@ Convergence Toolbox (CTB) is an open-source add-on dedicated to enhancing the sp
 # Installation
 
 - Download `ConvergenceToolbox.zip` right [here](https://github.com/SkyMound/ConvergenceToolbox/releases) and extract it.
-- Download LiveSplit [here](https://livesplit.org/downloads/) and extract it..
+- Download LiveSplit [here](https://livesplit.org/downloads/) and extract it.
 - Download `LiveSplit.Server.zip` [here](https://github.com/LiveSplit/LiveSplit.Server/releases) and place the content of this zip into "LiveSplit/Components".
 
 
@@ -23,7 +23,7 @@ Let's now see how to setup the Autsplit with LiveSplit.
 
 5. Run Convergence. Wait until you're on the main menu.
 
-6. Run `ConvergenceToolbox.exe`, afer few seconds you should see your CTB version in the top left corner of Convergence. Check `Enable AutoSplit` and start a new game.
+6. Run `ConvergenceToolbox.exe`, after few seconds you should see your CTB version in the top left corner of Convergence. Check `Enable AutoSplit` and start a new game.
 
 >**Note**
 >For all the other tools except Autosplit, you just need Convergence to be up and running before running CTB.
