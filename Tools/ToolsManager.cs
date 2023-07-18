@@ -43,10 +43,5 @@ namespace Tools
             gizmos = GetComponent<Gizmos>();
         }
 
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
     }
 }
