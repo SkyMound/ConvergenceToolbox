@@ -50,6 +50,12 @@ namespace Tools
         {
             autoloadEnabled = false;
             pathToFolder = Directory.GetCurrentDirectory();
+            using (StreamWriter sw = File.AppendText(path))
+            {
+                sw.WriteLine(pathToFolder);
+                GetSaves().ToString();
+            }
+
             persistentCheckpoint = new UpdraftRoomDoor();
         }
 
