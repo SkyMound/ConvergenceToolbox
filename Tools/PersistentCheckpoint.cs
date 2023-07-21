@@ -5,6 +5,7 @@ using System.IO;
 using System.Collections;
 using UnityEngine;
 using System;
+using System.Linq
 
 namespace Tools
 {
@@ -25,20 +26,22 @@ namespace Tools
             persistentCheckpoint.DoorNode = ServiceLocator.Instance.GetService<ServerLevelFlowScope>().SpawningDoorNode; // It only save DoorNode, won't really work.
         }
 
-        void LoadPersistent()
+        bool LoadPersistent()
         {
-            if(IsPersistentSet()){
-                ServiceLocator.Instance.GetService<ServerLevelFlowScope>().OnCheckpointReached(persistentCheckpoint, true);
-            }
-
+            if(!IsPersistentSet())
+                return false;
         }
 
         void SetSaveToPersistent(string name){
 
         }
 
-        void SavePersistent(string name){
+        bool SavePersistent(string name){
+            if(!IsPersistentSet())
+                return false;
 
+            if(GetSaves().Contains(name))
+                return false;
         }
 
         string[] GetSaves(){
