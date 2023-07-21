@@ -22,15 +22,9 @@ init
         vars.Helper["hasDJ"] = nhm.Make<int>("Instance","NetworkHero","SimulationHero",1,1,"PlatformerController","AirJumpCount");
         vars.Helper["hasDash"] = nhm.Make<int>("Instance","NetworkHero","SimulationHero","Dodger","HasDashAbility");
 
-        // Call Unity Function ?
-        var func
-        vars.Helper["gadgetSlots"] = ug.
         // Enum castable to string ?
         vars.Helper["worldZone"] = lvl.MakeString("Instance","LevelData","WorldZone");
         
-        vars.GetMostRecentAbility = (Func<string>)(()=>{
-            
-        });
 
     });
 }
