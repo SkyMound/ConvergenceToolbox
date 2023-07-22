@@ -5,14 +5,12 @@ using System.IO;
 using System.Collections;
 using UnityEngine;
 using System;
-using System.Linq
+using System.Linq;
 
 namespace Tools
 {
     public class PersistentCheckpoint : MonoBehaviour
     {
-        readonly string path = @"C:\Windows\Temp\CTB_Debug.txt";
-
         public UpdraftRoomDoor persistentCheckpoint;
         public string pathToFolder;
         public bool autoloadEnabled;
@@ -30,6 +28,7 @@ namespace Tools
         {
             if(!IsPersistentSet())
                 return false;
+            return true;
         }
 
         void SetSaveToPersistent(string name){
@@ -42,6 +41,7 @@ namespace Tools
 
             if(GetSaves().Contains(name))
                 return false;
+            return true;
         }
 
         string[] GetSaves(){
@@ -53,11 +53,7 @@ namespace Tools
         {
             autoloadEnabled = false;
             pathToFolder = Directory.GetCurrentDirectory();
-            using (StreamWriter sw = File.AppendText(path))
-            {
-                sw.WriteLine(pathToFolder);
-                GetSaves().ToString();
-            }
+            Debugger.Log(pathToFolder);
 
             persistentCheckpoint = new UpdraftRoomDoor();
         }
@@ -67,20 +63,14 @@ namespace Tools
         {
             if (Input.GetKeyDown(KeyCode.P))
             {
-                using (StreamWriter sw = File.AppendText(path))
-                {
-                    sw.WriteLine("Hit p");
-                }
+                Debugger.Log("Hit p");
                 try
                 {
                     StartCoroutine(SBNetworkManager.Instance.Server_StartLevel(false));
                     
                 }catch(Exception ex)
                 {
-                    using (StreamWriter sw = File.AppendText(path))
-                    {
-                        sw.WriteLine(ex.Message);
-                    }
+                    Debugger.Log(ex.Message);
                 }
             }
         }

@@ -74,10 +74,7 @@ namespace Tools
             }
             catch (Exception ex)
             {
-                using (StreamWriter sw = File.AppendText(path))
-                {
-                    sw.WriteLine("Error: " + ex.ToString());
-                }
+                Debugger.Log("Error: " + ex.ToString());
             }
 
         }
@@ -101,10 +98,7 @@ namespace Tools
                     }
                 }
             }
-            using (StreamWriter sw = File.AppendText(path))
-            {
-                sw.WriteLine("No shader found !");
-            }
+            Debugger.Log("No shader found !");
             return false;
         }
 
@@ -117,22 +111,9 @@ namespace Tools
                 RetrieveShader();
                 SBNetworkManager.Instance.Server_HeroesSpawned += this.SetupHitbox;
 
-
-                // This text is added only once to the file.
-                if (!File.Exists(path))
-                {
-                    // Create a file to write to.
-                    using (StreamWriter sw = File.CreateText(path))
-                    {
-                        sw.WriteLine("ConvergenceToolbox Debugger");
-                    }
-                }
             }catch(Exception ex)
             {
-                using (StreamWriter sw = File.AppendText(path))
-                {
-                    sw.WriteLine("Error at Gizmos start : " + ex.ToString());
-                }
+                Debugger.Log("Error at Gizmos start : " + ex.ToString());
             }
             
             
@@ -163,10 +144,7 @@ namespace Tools
 
         public void UpdateGizmos()
         {
-            using (StreamWriter sw = File.AppendText(path))
-            {
-                sw.WriteLine(isEnabled ? "Show Gizmos" : "Hide Gizmos"); // Debug
-            }
+            Debugger.Log(isEnabled ? "Show Gizmos" : "Hide Gizmos");
 
             isActive = isEnabled;
 
@@ -182,15 +160,8 @@ namespace Tools
             }
             else
             {
-                using (StreamWriter sw = File.AppendText(path))
-                {
-                    sw.WriteLine("Can't display !"); // Debug
-                }
+                Debugger.Log("Can't display !");
             }
         }
-
-
-        
-
     }
 }
