@@ -15,6 +15,7 @@ namespace Tools
 
         public static void Init()
         {
+            Debugger.Init();
             Load = new GameObject();
             Load.AddComponent<AutoSplit>();
             Load.AddComponent<Gizmos>();

@@ -6,6 +6,16 @@ namespace Tools
     public class Debugger 
     {
         readonly static string path = @"C:\Windows\Temp\CTB_Debug.txt";
+
+        public static void Init()
+        {
+            using (StreamWriter sw = File.CreateText(path))
+            {
+                sw.WriteLine("ConvergenceToolbox Debugger");
+                sw.WriteLine(ToolsLoader.GetVersionCTB());
+            }
+        }
+
         public static void Log(string message)
         {
             if (!File.Exists(path))
