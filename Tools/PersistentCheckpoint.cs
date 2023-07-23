@@ -14,6 +14,8 @@ namespace Tools
         public UpdraftRoomDoor persistentCheckpoint;
         public string pathToFolder;
         public bool autoloadEnabled;
+        NetworkPlayerSync playerSync; // Pause Menu
+
 
         bool IsPersistentSet(){
             return persistentCheckpoint.DoorNode != null;
@@ -66,9 +68,12 @@ namespace Tools
                 Debugger.Log("Hit p");
                 try
                 {
-                    StartCoroutine(SBNetworkManager.Instance.Server_StartLevel(false));
-                    
-                }catch(Exception ex)
+                    //this.playerSync = FindObjectOfType<NetworkPlayerSync>();
+                    //this.playerSync.PartySignal = PartySignal.RestartFromLastCheckpoint;
+                    ServiceLocator.Instance.GetService<ServerLevelFlowScope>().OnLevelFailed(LevelFailureType.KnockedOut);
+
+                }
+                catch(Exception ex)
                 {
                     Debugger.Log(ex.Message);
                 }
