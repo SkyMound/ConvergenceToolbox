@@ -1,5 +1,8 @@
 ﻿using System.Collections;
 using UnityEngine;
+using System.IO;
+using System.IO.Pipes;
+using System;
 
 namespace Tools
 {
@@ -7,8 +10,9 @@ namespace Tools
     {
         AutoSplit autoSplit;
         Gizmos gizmos;
+        PersistentCheckpoint checkpoint;
         bool uiEnabled;
-
+        GameObject Tools;
 
 
         private void OnGUI()
@@ -42,10 +46,46 @@ namespace Tools
         // Use this for initialization
         void Start()
         {
+            StartCoroutine(RetrieveInformation());
+
+            Tools = new GameObject();
+            autoSplit = Tools.AddComponent<AutoSplit>();
+            gizmos = Tools.AddComponent<Gizmos>();
+            checkpoint = Tools.AddComponent<PersistentCheckpoint>();
             uiEnabled = true;
-            autoSplit = GetComponent<AutoSplit>();
-            gizmos = GetComponent<Gizmos>();
         }
 
+
+
+        private static IEnumerator RetrieveInformation()
+        {
+            string projectPath = string.Empty;
+            yield return new WaitForSeconds(1f); // Making sure the server is up before connecting
+            try
+            {
+
+                using (NamedPipeClientStream clientPipe = new NamedPipeClientStream(".", "PipeCTB", PipeDirection.In))
+                {
+                    Debugger.Log("Connecting to the executable...");
+                    clientPipe.Connect();
+
+                    using (StreamReader reader = new StreamReader(clientPipe))
+                    {
+                        // Read the path of the 'target' folder from the named pipe
+                        projectPath = reader.ReadLine();
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(projectPath))
+                {
+                    string savesFolder = Path.Combine(projectPath, "Saves");
+                    Debugger.Log("Saves folder : " + savesFolder);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debugger.Log(ex.Message);
+            }
+        }
     }
 }

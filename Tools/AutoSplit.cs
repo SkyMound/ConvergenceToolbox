@@ -10,14 +10,11 @@ using DS.Tech.UI;
 using DS.Game.Items;
 using DS.Tech.Util;
 using DS.Tech.ProjectSettings;
-using DS.Tech.Saves;
-using static ParadoxNotion.Services.Logger;
 
 namespace Tools
 {
     class AutoSplit : MonoBehaviour
-    {
-        readonly string path = @"C:\Windows\Temp\CTB_Debug.txt";
+    {    
         readonly string startingDoorNode = "P1L1_TUT_Gameplay_RoomDoor_Checkpoint_GameStart";
 
 

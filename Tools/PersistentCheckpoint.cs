@@ -14,7 +14,7 @@ namespace Tools
         public UpdraftRoomDoor persistentCheckpoint;
         public string pathToFolder;
         public bool autoloadEnabled;
-        NetworkPlayerSync playerSync; // Pause Menu
+        //NetworkPlayerSync playerSync; // Pause Menu
 
 
         bool IsPersistentSet(){

@@ -72,9 +72,10 @@ namespace ConvergenceToolbox
                 serverPipe.WaitForConnection();
 
                 using (StreamWriter writer = new StreamWriter(serverPipe))
-                {
-                    // Send the path of the current folder to the DLL
+                { 
                     writer.WriteLine(information);
+                    writer.Flush(); // Flush the data to the pipe before closing
+                    serverPipe.WaitForPipeDrain(); // Wait until all data is written
                 }
             }
         }
