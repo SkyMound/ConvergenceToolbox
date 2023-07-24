@@ -54,8 +54,6 @@ namespace Tools
         void Start()
         {
             autoloadEnabled = false;
-            pathToFolder = Directory.GetCurrentDirectory();
-            Debugger.Log(pathToFolder);
 
             persistentCheckpoint = new UpdraftRoomDoor();
         }

@@ -14,10 +14,25 @@ namespace Tools
         bool uiEnabled;
         GameObject Tools;
 
+        public string Version { get; private set; } = "1.1.0";
 
+        private static ToolsManager _instance;
+        public static ToolsManager Instance { get { return _instance; } }
+
+        private void Awake()
+        {
+            if (_instance != null && _instance != this)
+            {
+                Destroy(this.gameObject);
+            }
+            else
+            {
+                _instance = this;
+            }
+        }
         private void OnGUI()
         {
-            uiEnabled = GUI.Toggle(new Rect(10, 10, 150, 20), uiEnabled, ToolsLoader.GetVersionCTB());
+            uiEnabled = GUI.Toggle(new Rect(10, 10, 150, 20), uiEnabled, "CTB_"+Version);
             
             if(uiEnabled){
                 // Autosplit checkbox
@@ -40,30 +55,24 @@ namespace Tools
                         gizmos.UpdateGizmos();
                 }
             }
-
         }
 
         // Use this for initialization
         void Start()
         {
-            StartCoroutine(RetrieveInformation());
+            Debugger.Init();
 
-            Tools = new GameObject();
-            autoSplit = Tools.AddComponent<AutoSplit>();
-            gizmos = Tools.AddComponent<Gizmos>();
-            checkpoint = Tools.AddComponent<PersistentCheckpoint>();
-            uiEnabled = true;
+            StartCoroutine(Init());
+
+            
         }
 
-
-
-        private static IEnumerator RetrieveInformation()
+        private IEnumerator Init()
         {
             string projectPath = string.Empty;
             yield return new WaitForSeconds(1f); // Making sure the server is up before connecting
             try
-            {
-
+            { 
                 using (NamedPipeClientStream clientPipe = new NamedPipeClientStream(".", "PipeCTB", PipeDirection.In))
                 {
                     Debugger.Log("Connecting to the executable...");
@@ -81,6 +90,13 @@ namespace Tools
                     string savesFolder = Path.Combine(projectPath, "Saves");
                     Debugger.Log("Saves folder : " + savesFolder);
                 }
+
+                Tools = new GameObject();
+                autoSplit = Tools.AddComponent<AutoSplit>();
+                gizmos = Tools.AddComponent<Gizmos>();
+                checkpoint = Tools.AddComponent<PersistentCheckpoint>();
+                GameObject.DontDestroyOnLoad(Tools);
+                uiEnabled = true;
             }
             catch (Exception ex)
             {

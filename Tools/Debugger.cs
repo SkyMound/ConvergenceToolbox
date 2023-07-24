@@ -11,8 +11,7 @@ namespace Tools
         {
             using (StreamWriter sw = File.CreateText(path))
             {
-                sw.WriteLine("ConvergenceToolbox Debugger");
-                sw.WriteLine(ToolsLoader.GetVersionCTB());
+                sw.WriteLine("ConvergenceToolbox_"+ ToolsManager.Instance.Version+ "_Debugger");
             }
         }
 
@@ -23,11 +22,9 @@ namespace Tools
                 // Create a file to write to.
                 using (StreamWriter sw = File.CreateText(path))
                 {
-                    sw.WriteLine("ConvergenceToolbox Debugger");
-                    sw.WriteLine(ToolsLoader.GetVersionCTB());
+                    sw.WriteLine("ConvergenceToolbox_" + ToolsManager.Instance.Version + "_Debugger");
                     sw.WriteLine(message);
-                    Debug.WriteLine("ConvergenceToolbox Debugger");
-                    Debug.WriteLine(ToolsLoader.GetVersionCTB());
+                    Debug.WriteLine("ConvergenceToolbox_" + ToolsManager.Instance.Version + "_Debugger");
                 }
             }
             else

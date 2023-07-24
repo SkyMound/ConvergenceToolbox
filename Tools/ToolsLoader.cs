@@ -1,4 +1,6 @@
 ﻿
+using System;
+using System.IO;
 using UnityEngine;
 
 namespace Tools
@@ -9,8 +11,6 @@ namespace Tools
 
         public static void Init()
         {
-            Debugger.Init();
-
             Load = new GameObject();
             Load.AddComponent<ToolsManager>();
             GameObject.DontDestroyOnLoad(Load);
@@ -21,10 +21,7 @@ namespace Tools
             GameObject.Destroy(Load);
         }
 
-        public static string GetVersionCTB()
-        {
-            return "CTB_1.1.0";
-        }
+        
 
     }
 }
