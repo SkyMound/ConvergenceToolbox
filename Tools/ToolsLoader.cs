@@ -16,6 +16,9 @@ namespace Tools
         public static void Init()
         {
             Debugger.Init();
+
+            RetrieveInformation();
+
             Load = new GameObject();
             Load.AddComponent<AutoSplit>();
             Load.AddComponent<Gizmos>();
@@ -32,6 +35,28 @@ namespace Tools
         public static string GetVersionCTB()
         {
             return "CTB_1.1.0";
+        }
+
+        private static RetrieveInformation(){
+            string projectPath = string.Empty;
+
+            using (NamedPipeClientStream clientPipe = new NamedPipeClientStream(".", "PipeCTB", PipeDirection.In))
+            {
+                Debugger.Log("Connecting to the executable...");
+                clientPipe.Connect();
+
+                using (StreamReader reader = new StreamReader(clientPipe))
+                {
+                    // Read the path of the 'target' folder from the named pipe
+                    projectPath = reader.ReadLine();
+                }
+            }
+
+            if (!string.IsNullOrEmpty(projectPath))
+            {
+                string savesFolder = Path.Combine(projectPath, "Saves");
+                Debugger.Log("Folder retrieved : "+ savesFolder);
+            }
         }
     }
 }
