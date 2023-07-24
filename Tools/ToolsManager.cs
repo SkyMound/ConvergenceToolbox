@@ -15,6 +15,7 @@ namespace Tools
         GameObject Tools;
 
         public string Version { get; private set; } = "1.1.0";
+        public string SavesFolder { get; private set; }
 
         private static ToolsManager _instance;
         public static ToolsManager Instance { get { return _instance; } }
@@ -87,8 +88,8 @@ namespace Tools
 
                 if (!string.IsNullOrEmpty(projectPath))
                 {
-                    string savesFolder = Path.Combine(projectPath, "Saves");
-                    Debugger.Log("Saves folder : " + savesFolder);
+                    SavesFolder = Path.Combine(projectPath, "Saves");
+                    Debugger.Log("Saves folder : " + SavesFolder);
                 }
 
                 Tools = new GameObject();

@@ -6,30 +6,47 @@ using System.Collections;
 using UnityEngine;
 using System;
 using System.Linq;
+using DS.Tech.Saves;
+using System.Text;
 
 namespace Tools
 {
     public class PersistentCheckpoint : MonoBehaviour
     {
+        public SaveRootDataView<UpdraftSaveProfile> persistent;
         public UpdraftRoomDoor persistentCheckpoint;
+        public Hero_Server persistentHero;
         public string pathToFolder;
         public bool autoloadEnabled;
         //NetworkPlayerSync playerSync; // Pause Menu
 
 
         bool IsPersistentSet(){
-            return persistentCheckpoint.DoorNode != null;
+            return persistentCheckpoint.DoorNode != null && persistentHero != null;
         }
 
         void SetCurrentToPersistent()
         {
-            persistentCheckpoint.DoorNode = ServiceLocator.Instance.GetService<ServerLevelFlowScope>().SpawningDoorNode; // It only save DoorNode, won't really work.
+            //persistentHero = NetworkHeroManager.Instance.NetworkHero.ServerHero;
+            //persistentCheckpoint.DoorNode = UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.RespawnDoorNode;
+            //persistent = UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.
         }
 
         bool LoadPersistent()
         {
-            if(!IsPersistentSet())
-                return false;
+            //if (!IsPersistentSet())
+              //  return false;
+            string saveFile = @"D:\Steam\userdata\317573976\1276800\remote\Profile_1";
+
+            using (var stream = File.Open(saveFile, FileMode.Open))
+            {
+                using (var reader = new BinaryReader(stream, Encoding.UTF8, false))
+                {
+                    UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.ReadFromSave(reader);
+                }
+            }
+            //UpdraftGame.Instance.SaveProfileManager.Save(persistentHero, persistentCheckpoint.DoorNode);
+            ServiceLocator.Instance.GetService<ServerLevelFlowScope>().OnLevelFailed(LevelFailureType.KnockedOut);
             return true;
         }
 
@@ -47,7 +64,7 @@ namespace Tools
         }
 
         string[] GetSaves(){
-            return Directory.GetFiles(pathToFolder);
+            return Directory.GetFiles(ToolsManager.Instance.SavesFolder);
         }
 
         // Use this for initialization
@@ -56,26 +73,31 @@ namespace Tools
             autoloadEnabled = false;
 
             persistentCheckpoint = new UpdraftRoomDoor();
+
         }
 
         // Update is called once per frame
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.P))
+            try
             {
-                Debugger.Log("Hit p");
-                try
+                if (Input.GetKeyDown(KeyCode.P))
                 {
-                    //this.playerSync = FindObjectOfType<NetworkPlayerSync>();
-                    //this.playerSync.PartySignal = PartySignal.RestartFromLastCheckpoint;
-                    ServiceLocator.Instance.GetService<ServerLevelFlowScope>().OnLevelFailed(LevelFailureType.KnockedOut);
+                    Debugger.Log("Hit p");
+                    LoadPersistent();
 
                 }
-                catch(Exception ex)
+                else if (Input.GetKeyDown(KeyCode.O))
                 {
-                    Debugger.Log(ex.Message);
+                    Debugger.Log("Hit o");
+                    SetCurrentToPersistent();
                 }
             }
+            catch (Exception ex)
+            {
+                Debugger.Log(ex.Message);
+            }
+            
         }
     }
 }
