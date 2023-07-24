@@ -64,7 +64,8 @@ namespace ConvergenceToolbox
         }
 
 
-        private static SendInformation(string information){
+        private static void SendInformation(string information){
+            Console.WriteLine("Creating pipe...");
             using (NamedPipeServerStream serverPipe = new NamedPipeServerStream("PipeCTB", PipeDirection.Out))
             {
                 Console.WriteLine("Waiting for the DLL to connect...");

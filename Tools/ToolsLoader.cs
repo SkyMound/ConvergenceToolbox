@@ -39,25 +39,34 @@ namespace Tools
             return "CTB_1.1.0";
         }
 
-        private static RetrieveInformation(){
+        private static void RetrieveInformation(){
             string projectPath = string.Empty;
 
-            using (NamedPipeClientStream clientPipe = new NamedPipeClientStream(".", "PipeCTB", PipeDirection.In))
+            try
             {
-                Debugger.Log("Connecting to the executable...");
-                clientPipe.Connect();
 
-                using (StreamReader reader = new StreamReader(clientPipe))
+                using (NamedPipeClientStream clientPipe = new NamedPipeClientStream(".", "PipeCTB", PipeDirection.In))
                 {
-                    // Read the path of the 'target' folder from the named pipe
-                    projectPath = reader.ReadLine();
-                }
-            }
+                    Debugger.Log("Connecting to the executable...");
+                    clientPipe.Connect();
+                    Debugger.Log("Connected");
 
-            if (!string.IsNullOrEmpty(projectPath))
+                    using (StreamReader reader = new StreamReader(clientPipe))
+                    {
+                        // Read the path of the 'target' folder from the named pipe
+                        projectPath = reader.ReadLine();
+
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(projectPath))
+                {
+                    string savesFolder = Path.Combine(projectPath, "Saves");
+                    Debugger.Log("Saves folder : "+ savesFolder);
+                }
+            }catch(Exception ex)
             {
-                string savesFolder = Path.Combine(projectPath, "Saves");
-                Debugger.Log("Folder retrieved : "+ savesFolder);
+                Debugger.Log(ex.Message);
             }
         }
     }
