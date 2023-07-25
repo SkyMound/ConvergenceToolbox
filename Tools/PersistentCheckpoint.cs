@@ -8,6 +8,7 @@ using System;
 using System.Linq;
 using DS.Tech.Saves;
 using System.Text;
+using DS.Tech.App;
 
 namespace Tools
 {
@@ -30,30 +31,43 @@ namespace Tools
         {
             File.Copy(
                 Path.Combine(ToolsManager.Instance.SteamSavesFolder,UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Root.Key),
-                Path.Combine(ToolsManager.Instance.SavesFolder,"Current")
+                Path.Combine(ToolsManager.Instance.SavesFolder,"Current"),
+                true
             );
             // persistentHero = NetworkHeroManager.Instance.NetworkHero.ServerHero;
             // persistentCheckpoint.DoorNode = UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.RespawnDoorNode;
             // persistent = UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile;
         }
 
-        IEnumerator LoadPersistent()
+        void LoadPersistent()
         {
-            if(!IsPersistentSet())
-                return false;
+            DSApplicationBuildSettings settings = new DSApplicationBuildSettings();
+            DSApplicationBuildConfig.Instance.WriteBuildSettings(settings);
+            Debugger.Log(DSApplicationBuildConfig.Instance.DSApplicationBuildSettings.EnableDebugFeatures.ToString());
 
-            File.Copy(
-                Path.Combine(ToolsManager.Instance.SavesFolder,"Current"),
-                Path.Combine(ToolsManager.Instance.SteamSavesFolder,UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Root.Key)
-            );
+            //UpdraftCheatController.Instance.SetCheatSystemActive(true);
+
+            /*
+            try
+            {
+                Debugger.Log("Copy to " + Path.Combine(ToolsManager.Instance.SteamSavesFolder, UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Root.Key));
+                //File.Copy(
+                //    Path.Combine(ToolsManager.Instance.SavesFolder,"Current"),
+                //    Path.Combine(ToolsManager.Instance.SteamSavesFolder,UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Root.Key),
+                //    true
+                //);
             
-            Debugger.Log(UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.SecondsPlayed);
-            UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Load();
-            yield return UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.WaitUntilLoaded;
-            Debugger.Log(UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.SecondsPlayed);
+                Debugger.Log(UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.SecondsPlayed.ToString());
+                UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Load();
+            }catch(Exception ex)
+            {
+                Debugger.Log(ex.Message);
+            }
+                yield return UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.WaitUntilLoaded;
+                Debugger.Log(UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.SecondsPlayed.ToString());
 
-            ServiceLocator.Instance.GetService<ServerLevelFlowScope>().OnLevelFailed(LevelFailureType.KnockedOut);
-
+                ServiceLocator.Instance.GetService<ServerLevelFlowScope>().OnLevelFailed(LevelFailureType.KnockedOut);
+            */
             // Copy saved file to steam folder
             // UpdraftGame.Instance.SaveProfileManager.LoadSaveData() ou UpdraftGame.Instance.SaveProfileManager.InitSaveDataViews()
             // assign currentsaveprofile to GetlatestSaveProfile()
@@ -78,7 +92,7 @@ namespace Tools
             //     }
             // }
             //UpdraftGame.Instance.SaveProfileManager.Save(persistentHero, persistentCheckpoint.DoorNode);
-            
+
         }
 
         void SetSaveToPersistent(string name){
@@ -117,24 +131,7 @@ namespace Tools
         // Update is called once per frame
         void Update()
         {
-            try
-            {
-                if (Input.GetKeyDown(KeyCode.P))
-                {
-                    Debugger.Log("Hit p");
-                    LoadPersistent();
-
-                }
-                else if (Input.GetKeyDown(KeyCode.O))
-                {
-                    Debugger.Log("Hit o");
-                    SetCurrentToPersistent();
-                }
-            }
-            catch (Exception ex)
-            {
-                Debugger.Log(ex.Message);
-            }
+            
             
         }
     }

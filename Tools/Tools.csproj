@@ -383,6 +383,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoSplit.cs" />
+    <Compile Include="GodMode.cs" />
     <Compile Include="Gizmos.cs" />
     <Compile Include="Debugger.cs" />
     <Compile Include="PersistentCheckpoint.cs" />

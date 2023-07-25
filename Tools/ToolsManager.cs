@@ -45,18 +45,27 @@ namespace Tools
                     autoSplit.StartAutoSplit();
                     gizmos.isEnabled = false;
                     gizmos.UpdateGizmos();
+                    GodMode.isEnabled = false;
+                    GodMode.ToggleGodMode();
                 }
                 else if (!autoSplit.isEnabled && autoSplit.isActive)
                     autoSplit.StopAutoSplit();
 
-                // Gizmos checkbox
                 if(!autoSplit.isEnabled){
 
+                    // Gizmos checkbox
                     gizmos.isEnabled = GUI.Toggle(new Rect(10, 50, 150, 20), gizmos.isEnabled, "Show Gizmos");
 
                     if (gizmos.isEnabled != gizmos.isActive)
                         gizmos.UpdateGizmos();
+
+                    // GodMode checkbox
+                    GodMode.isEnabled = GUI.Toggle(new Rect(10, 70, 150, 20), GodMode.isEnabled, "Enable GodMode");
+                    if (GodMode.isEnabled != GodMode.isActive)
+                        GodMode.ToggleGodMode();
                 }
+
+            
             }
         }
 
@@ -72,9 +81,9 @@ namespace Tools
 
         private IEnumerator Init()
         {
-            string steamFolder = Path.GetCurrentDirectory(Path.GetCurrentDirectory(Path.GetDirectoryName(Directory.GetCurrentDirectory())));
-            SteamSavesFolder = Path.Combine(new string[]{steamFolder,'userdata',steamID,'1276800','remote'});
-
+            string steamFolder = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Directory.GetCurrentDirectory())));
+            SteamSavesFolder = Path.Combine(new string[]{steamFolder,"userdata",steamID,"1276800","remote"});
+            Debugger.Log(SteamSavesFolder);
             string projectPath = string.Empty;
             yield return new WaitForSeconds(1f); // Making sure the server is up before connecting
             try
