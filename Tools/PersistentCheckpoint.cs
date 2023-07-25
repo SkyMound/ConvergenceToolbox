@@ -23,7 +23,7 @@ namespace Tools
 
 
         bool IsPersistentSet(){
-            return GetSaves().Contains("Current")
+            return GetSaves().Contains("Current");
         }
 
         void SetCurrentToPersistent()
@@ -46,11 +46,13 @@ namespace Tools
                 Path.Combine(ToolsManager.Instance.SavesFolder,"Current"),
                 Path.Combine(ToolsManager.Instance.SteamSavesFolder,UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Root.Key)
             );
-
+            
+            Debugger.Log(UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.SecondsPlayed);
             UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Load();
+            yield return UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.WaitUntilLoaded;
+            Debugger.Log(UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.SecondsPlayed);
 
             ServiceLocator.Instance.GetService<ServerLevelFlowScope>().OnLevelFailed(LevelFailureType.KnockedOut);
-            return true;
 
             // Copy saved file to steam folder
             // UpdraftGame.Instance.SaveProfileManager.LoadSaveData() ou UpdraftGame.Instance.SaveProfileManager.InitSaveDataViews()
