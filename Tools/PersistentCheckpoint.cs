@@ -16,50 +16,86 @@ namespace Tools
         public SaveRootDataView<UpdraftSaveProfile> persistent;
         public UpdraftRoomDoor persistentCheckpoint;
         public Hero_Server persistentHero;
+        public string persistentName;
         public string pathToFolder;
         public bool autoloadEnabled;
         //NetworkPlayerSync playerSync; // Pause Menu
 
 
         bool IsPersistentSet(){
-            return persistentCheckpoint.DoorNode != null && persistentHero != null;
+            return GetSaves().Contains("Current")
         }
 
         void SetCurrentToPersistent()
         {
-            //persistentHero = NetworkHeroManager.Instance.NetworkHero.ServerHero;
-            //persistentCheckpoint.DoorNode = UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.RespawnDoorNode;
-            //persistent = UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.
+            File.Copy(
+                Path.Combine(ToolsManager.Instance.SteamSavesFolder,UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Root.Key),
+                Path.Combine(ToolsManager.Instance.SavesFolder,"Current")
+            );
+            // persistentHero = NetworkHeroManager.Instance.NetworkHero.ServerHero;
+            // persistentCheckpoint.DoorNode = UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.RespawnDoorNode;
+            // persistent = UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile;
         }
 
-        bool LoadPersistent()
+        IEnumerator LoadPersistent()
         {
-            //if (!IsPersistentSet())
-              //  return false;
-            string saveFile = @"D:\Steam\userdata\317573976\1276800\remote\Profile_1";
+            if(!IsPersistentSet())
+                return false;
 
-            using (var stream = File.Open(saveFile, FileMode.Open))
-            {
-                using (var reader = new BinaryReader(stream, Encoding.UTF8, false))
-                {
-                    UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.ReadFromSave(reader);
-                }
-            }
-            //UpdraftGame.Instance.SaveProfileManager.Save(persistentHero, persistentCheckpoint.DoorNode);
+            File.Copy(
+                Path.Combine(ToolsManager.Instance.SavesFolder,"Current"),
+                Path.Combine(ToolsManager.Instance.SteamSavesFolder,UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Root.Key)
+            );
+
+            UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Load();
+
             ServiceLocator.Instance.GetService<ServerLevelFlowScope>().OnLevelFailed(LevelFailureType.KnockedOut);
             return true;
+
+            // Copy saved file to steam folder
+            // UpdraftGame.Instance.SaveProfileManager.LoadSaveData() ou UpdraftGame.Instance.SaveProfileManager.InitSaveDataViews()
+            // assign currentsaveprofile to GetlatestSaveProfile()
+            // restart game
+
+            // Copy persistent file to steam folder en utilisant UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Root.Key
+            // UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Load();
+            // restart game
+
+
+            // SaveSystem
+            // Deep copy into currentsaveprofile or UpdraftGame.Instance.SaveProfileManager.Save(...)
+            // https://stackoverflow.com/questions/129389/how-do-you-do-a-deep-copy-of-an-object-in-net
+            // restart game
+
+            //yield return UpdraftGame.Instance.SaveProfileManager.LoadSaveData();
+            // using (var stream = File.Open(saveFile, FileMode.Open))
+            // {
+            //     using (var reader = new BinaryReader(stream, Encoding.UTF8, false))
+            //     {
+            //         UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.ReadFromSave(reader);
+            //     }
+            // }
+            //UpdraftGame.Instance.SaveProfileManager.Save(persistentHero, persistentCheckpoint.DoorNode);
+            
         }
 
         void SetSaveToPersistent(string name){
+            if(!GetSaves().Contains(name))
+                return;
 
+            File.Copy(
+                Path.Combine(ToolsManager.Instance.SavesFolder,name),
+                Path.Combine(ToolsManager.Instance.SavesFolder,"Current")
+            );
         }
 
         bool SavePersistent(string name){
             if(!IsPersistentSet())
                 return false;
-
-            if(GetSaves().Contains(name))
-                return false;
+            File.Copy(
+                Path.Combine(ToolsManager.Instance.SavesFolder,"Current"),
+                Path.Combine(ToolsManager.Instance.SavesFolder,name)
+            );
             return true;
         }
 

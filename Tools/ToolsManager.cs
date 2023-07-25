@@ -15,7 +15,9 @@ namespace Tools
         GameObject Tools;
 
         public string Version { get; private set; } = "1.1.0";
+        public string steamID { get; private set;} = "317573976";
         public string SavesFolder { get; private set; }
+        public string SteamSavesFolder {get; private set;}
 
         private static ToolsManager _instance;
         public static ToolsManager Instance { get { return _instance; } }
@@ -70,6 +72,9 @@ namespace Tools
 
         private IEnumerator Init()
         {
+            string steamFolder = Path.GetCurrentDirectory(Path.GetCurrentDirectory(Path.GetDirectoryName(Directory.GetCurrentDirectory())));
+            SteamSavesFolder = Path.Combine(new string[]{steamFolder,'userdata',steamID,'1276800','remote'});
+
             string projectPath = string.Empty;
             yield return new WaitForSeconds(1f); // Making sure the server is up before connecting
             try
