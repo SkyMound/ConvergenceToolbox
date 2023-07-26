@@ -12,7 +12,6 @@ init
     vars.Helper.TryLoad = (Func<dynamic,bool>)(mono=>{
         var nhm = mono["NetworkHeroManager"];
         var lvl = mono["Level"];
-        var ug = mono["UpdraftGame"];
 
         // Lensable castable to standard ?
         vars.Helper["hasTW"] = nhm.Make<bool>("Instance","NetworkHero","SimulationHero","HasTimewinderAbility");
@@ -25,7 +24,7 @@ init
         // Enum castable to string ?
         vars.Helper["worldZone"] = lvl.MakeString("Instance","LevelData","WorldZone");
         
-
+        // For Final Boss, split when worldzone change
     });
 }
 
