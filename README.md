@@ -36,13 +36,12 @@ Let's now see how to setup the Autsplit with LiveSplit.
     - Handles RTA (start to end no pauses at all) and IGT (without loads, menu pauses) timers.
 - Gizmos 
     - Hitbox trigger for Checkpoint, Battle, Cutscene and Level Loader.
+- God Mode (Unlock lots of cheats and utilities build by the developpers to debug the game)
 
 ## Upcoming
-- Save/Checkpoint Manager
 - In-game Tips/Tricks
-- Modding
 - Camera control
-
+- Abilites logger
 
 # Contributing
 
