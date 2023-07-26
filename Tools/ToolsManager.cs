@@ -13,7 +13,6 @@ namespace Tools
         PersistentCheckpoint checkpoint;
         GodMode gm;
         bool uiEnabled;
-        GameObject Tools;
 
         public string Version { get; private set; } = "1.1.0";
         public string steamID { get; private set;} = "317573976";
@@ -86,13 +85,16 @@ namespace Tools
             SteamSavesFolder = Path.Combine(new string[]{steamFolder,"userdata",steamID,"1276800","remote"});
             Debugger.Log(SteamSavesFolder);
             string projectPath = string.Empty;
-            yield return new WaitForSeconds(1f); // Making sure the server is up before connecting
             try
             { 
                 using (NamedPipeClientStream clientPipe = new NamedPipeClientStream(".", "PipeCTB", PipeDirection.In))
                 {
                     Debugger.Log("Connecting to the executable...");
-                    clientPipe.Connect();
+                    while(!clientPipe.IsConnected){
+                        clientPipe.Connect();
+                        Debugger.Log(".");
+                        yield return;
+                    }
 
                     using (StreamReader reader = new StreamReader(clientPipe))
                     {
@@ -107,13 +109,11 @@ namespace Tools
                     Debugger.Log("Saves folder : " + SavesFolder);
                 }
 
-                Tools       = new GameObject();
-                autoSplit   = Tools.AddComponent<AutoSplit>();
+                autoSplit   = gameObject.AddComponent<AutoSplit>();
                 gizmos      = new Gizmos();
                 checkpoint  = new PersistentCheckpoint();
                 gm          = new GodMode();
                 uiEnabled   = true;
-                GameObject.DontDestroyOnLoad(Tools);
             }
             catch (Exception ex)
             {
