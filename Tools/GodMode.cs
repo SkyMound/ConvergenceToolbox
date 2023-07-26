@@ -9,19 +9,19 @@ namespace Tools
 {
     class GodMode
     {
-        static DSApplicationBuildSettings defaultSettings;
-        static DSApplicationBuildSettings godModeSettings;
-        public static bool isEnabled;
-        public static bool isActive;
+        DSApplicationBuildSettings defaultSettings;
+        DSApplicationBuildSettings godModeSettings;
+        public bool isEnabled;
+        public bool isActive;
 
-        public static void Init()
+        GodMode()
         {
             defaultSettings = DSApplicationBuildConfig.Instance.DSApplicationBuildSettings;
             godModeSettings = new DSApplicationBuildSettings();
             isEnabled = false;
         }
 
-        public static void ToggleGodMode()
+        public void ToggleGodMode()
         {
             try{
                 isActive = isEnabled;

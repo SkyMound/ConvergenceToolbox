@@ -12,7 +12,7 @@ using DS.Tech.App;
 
 namespace Tools
 {
-    public class PersistentCheckpoint : MonoBehaviour
+    public class PersistentCheckpoint
     {
         public SaveRootDataView<UpdraftSaveProfile> persistent;
         public UpdraftRoomDoor persistentCheckpoint;
@@ -22,6 +22,15 @@ namespace Tools
         public bool autoloadEnabled;
         //NetworkPlayerSync playerSync; // Pause Menu
 
+
+        // Use this for initialization
+        PersistentCheckpoint()
+        {
+            autoloadEnabled = false;
+
+            persistentCheckpoint = new UpdraftRoomDoor();
+
+        }
 
         bool IsPersistentSet(){
             return GetSaves().Contains("Current");
@@ -119,20 +128,7 @@ namespace Tools
             return Directory.GetFiles(ToolsManager.Instance.SavesFolder);
         }
 
-        // Use this for initialization
-        void Start()
-        {
-            autoloadEnabled = false;
+        
 
-            persistentCheckpoint = new UpdraftRoomDoor();
-
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            
-            
-        }
     }
 }

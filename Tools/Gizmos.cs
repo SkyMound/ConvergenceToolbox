@@ -10,7 +10,7 @@ using static UnityEngine.Rendering.DebugUI;
 
 namespace Tools
 {
-    public class Gizmos : MonoBehaviour
+    public class Gizmos
     {
         readonly string path = @"C:\Windows\Temp\CTB_Debug.txt";
         readonly Color cutsceneColor = Color.blue;
@@ -27,6 +27,23 @@ namespace Tools
         public bool isEnabled;
         public bool isActive;
         public bool hasCreatedLine;
+
+
+        public Gizmos()
+        {
+            lineRenderers = new List<LineRenderer>();
+            hasCreatedLine = false;
+            try
+            {
+                RetrieveShader();
+                SBNetworkManager.Instance.Server_HeroesSpawned += this.SetupHitbox;
+
+            }catch(Exception ex)
+            {
+                Debugger.Log("Error at Gizmos constructor : " + ex.ToString());
+            } 
+        }
+
 
         void SetupHitbox()
         {
@@ -103,22 +120,7 @@ namespace Tools
             return false;
         }
 
-        void Start()
-        {
-            lineRenderers = new List<LineRenderer>();
-            hasCreatedLine = false;
-            try
-            {
-                RetrieveShader();
-                SBNetworkManager.Instance.Server_HeroesSpawned += this.SetupHitbox;
-
-            }catch(Exception ex)
-            {
-                Debugger.Log("Error at Gizmos start : " + ex.ToString());
-            }
-            
-            
-        }
+        
 
         LineRenderer CreateLineRenderer(GameObject boundsContainer, Bounds bounds, Color color){
             LineRenderer lr = boundsContainer.AddComponent<LineRenderer>();

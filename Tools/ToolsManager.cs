@@ -11,6 +11,7 @@ namespace Tools
         AutoSplit autoSplit;
         Gizmos gizmos;
         PersistentCheckpoint checkpoint;
+        GodMode gm;
         bool uiEnabled;
         GameObject Tools;
 
@@ -60,9 +61,9 @@ namespace Tools
                         gizmos.UpdateGizmos();
 
                     // GodMode checkbox
-                    GodMode.isEnabled = GUI.Toggle(new Rect(10, 70, 150, 20), GodMode.isEnabled, "Enable GodMode");
-                    if (GodMode.isEnabled != GodMode.isActive)
-                        GodMode.ToggleGodMode();
+                    gm.isEnabled = GUI.Toggle(new Rect(10, 70, 150, 20), gm.isEnabled, "Enable GodMode");
+                    if (gm.isEnabled != gm.isActive)
+                        gm.ToggleGodMode();
                 }
 
             
@@ -106,13 +107,13 @@ namespace Tools
                     Debugger.Log("Saves folder : " + SavesFolder);
                 }
 
-                Tools = new GameObject();
-                autoSplit = Tools.AddComponent<AutoSplit>();
-                gizmos = Tools.AddComponent<Gizmos>();
-                checkpoint = Tools.AddComponent<PersistentCheckpoint>();
-                GodMode.Init();
+                Tools       = new GameObject();
+                autoSplit   = Tools.AddComponent<AutoSplit>();
+                gizmos      = new Gizmos();
+                checkpoint  = new PersistentCheckpoint();
+                gm          = new GodMode();
+                uiEnabled   = true;
                 GameObject.DontDestroyOnLoad(Tools);
-                uiEnabled = true;
             }
             catch (Exception ex)
             {
