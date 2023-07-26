@@ -110,6 +110,7 @@ namespace Tools
                 autoSplit = Tools.AddComponent<AutoSplit>();
                 gizmos = Tools.AddComponent<Gizmos>();
                 checkpoint = Tools.AddComponent<PersistentCheckpoint>();
+                GodMode.Init();
                 GameObject.DontDestroyOnLoad(Tools);
                 uiEnabled = true;
             }

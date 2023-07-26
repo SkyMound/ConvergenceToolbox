@@ -23,14 +23,18 @@ namespace Tools
 
         public static void ToggleGodMode()
         {
-            isActive = isEnabled;
-            if (isEnabled)
-            {
-                DSApplicationBuildConfig.Instance.WriteBuildSettings(godModeSettings);
-            }
-            else
-            {
-                DSApplicationBuildConfig.Instance.WriteBuildSettings(defaultSettings);
+            try{
+                isActive = isEnabled;
+                if (isEnabled)
+                {
+                    DSApplicationBuildConfig.Instance.WriteBuildSettings(godModeSettings);
+                }
+                else
+                {
+                    DSApplicationBuildConfig.Instance.WriteBuildSettings(defaultSettings);
+                }
+            }catch(Exception ex){
+                Debugger.Log(ex.Message);
             }
             
         }
