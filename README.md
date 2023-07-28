@@ -62,7 +62,7 @@ Build the project with [.NET Framework 4.8 SDK](https://dotnet.microsoft.com/en-
 
 And you're ready to go.
 
-## Acknowledgements
+## Acknowledgments
 
 - Huge thanks to [Double Stallion](https://dblstallion.com/) for designing the masterpiece that is [Convergence](https://convrgencegame.com/). I really enjoyed playing it, and discovering lots of new mechanics! 
 - [SharpMonoInjector](https://github.com/warbler/SharpMonoInjector) - A tool for injecting assemblies into Mono embedded applications.
