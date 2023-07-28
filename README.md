@@ -52,11 +52,7 @@ We highly appreciate contributions from the community! If you encounter any issu
 
 ## Build the project
 
-```
-git clone https://github.com/SkyMound/ConvergenceToolbox.git
-```
-
-Resolve dependencies of Tools project by referencing the dll located in the Convergence folder. No need to add them all, prioritize the one starting with DS and Unity.
+Fork the repository and resolve dependencies of `Tools` project by referencing the dll located in the Convergence folder. No need to add them all, prioritize the one starting with DS and Unity.
 
 ```
 ...\Steam\steamapps\common\Convergence\Convergence_Data\Managed
@@ -65,3 +61,8 @@ Resolve dependencies of Tools project by referencing the dll located in the Conv
 Build the project with [.NET Framework 4.8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48)
 
 And you're ready to go.
+
+## Acknowledgements
+
+- Huge thanks to [Double Stallion](https://dblstallion.com/) for designing the masterpiece that is [Convergence](https://convrgencegame.com/). I really enjoyed playing it, and discovering lots of new mechanics! 
+- [SharpMonoInjector](https://github.com/warbler/SharpMonoInjector) - A tool for injecting assemblies into Mono embedded applications.

@@ -4,13 +4,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.UIElements;
-using static UnityEngine.Rendering.DebugUI;
 
 namespace Tools
 {
-    public class Gizmos
+    public class Gizmos : MonoBehaviour
     {
         readonly string path = @"C:\Windows\Temp\CTB_Debug.txt";
         readonly Color cutsceneColor = Color.blue;
@@ -29,7 +26,7 @@ namespace Tools
         public bool hasCreatedLine;
 
 
-        public Gizmos()
+        void Start()
         {
             lineRenderers = new List<LineRenderer>();
             hasCreatedLine = false;

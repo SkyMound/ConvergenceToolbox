@@ -14,7 +14,7 @@ namespace Tools
         public bool isEnabled;
         public bool isActive;
 
-        GodMode()
+        public GodMode()
         {
             defaultSettings = DSApplicationBuildConfig.Instance.DSApplicationBuildSettings;
             godModeSettings = new DSApplicationBuildSettings();

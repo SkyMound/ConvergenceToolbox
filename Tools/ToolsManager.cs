@@ -10,7 +10,6 @@ namespace Tools
     {
         AutoSplit autoSplit;
         Gizmos gizmos;
-        PersistentCheckpoint checkpoint;
         GodMode gm;
         bool uiEnabled;
 
@@ -45,8 +44,8 @@ namespace Tools
                     autoSplit.StartAutoSplit();
                     gizmos.isEnabled = false;
                     gizmos.UpdateGizmos();
-                    GodMode.isEnabled = false;
-                    GodMode.ToggleGodMode();
+                    gm.isEnabled = false;
+                    gm.ToggleGodMode();
                 }
                 else if (!autoSplit.isEnabled && autoSplit.isActive)
                     autoSplit.StopAutoSplit();
@@ -85,40 +84,37 @@ namespace Tools
             SteamSavesFolder = Path.Combine(new string[]{steamFolder,"userdata",steamID,"1276800","remote"});
             Debugger.Log(SteamSavesFolder);
             string projectPath = string.Empty;
-            try
-            { 
-                using (NamedPipeClientStream clientPipe = new NamedPipeClientStream(".", "PipeCTB", PipeDirection.In))
-                {
-                    Debugger.Log("Connecting to the executable...");
-                    while(!clientPipe.IsConnected){
-                        clientPipe.Connect();
-                        Debugger.Log(".");
-                        yield return;
-                    }
-
-                    using (StreamReader reader = new StreamReader(clientPipe))
-                    {
-                        // Read the path of the 'target' folder from the named pipe
-                        projectPath = reader.ReadLine();
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(projectPath))
-                {
-                    SavesFolder = Path.Combine(projectPath, "Saves");
-                    Debugger.Log("Saves folder : " + SavesFolder);
-                }
-
-                autoSplit   = gameObject.AddComponent<AutoSplit>();
-                gizmos      = new Gizmos();
-                checkpoint  = new PersistentCheckpoint();
-                gm          = new GodMode();
-                uiEnabled   = true;
-            }
-            catch (Exception ex)
+            using (NamedPipeClientStream clientPipe = new NamedPipeClientStream(".", "PipeCTB", PipeDirection.In))
             {
-                Debugger.Log(ex.Message);
+                Debugger.Log("Connecting to the executable...");
+                while(!clientPipe.IsConnected){
+                    try
+                    {
+                        clientPipe.Connect();
+                    }catch(Exception ex)
+                    {
+                        Debugger.Log(".");
+                    }
+                    yield return null;
+                }
+
+                using (StreamReader reader = new StreamReader(clientPipe))
+                {
+                    // Read the path of the 'target' folder from the named pipe
+                    projectPath = reader.ReadLine();
+                }
             }
+
+            if (!string.IsNullOrEmpty(projectPath))
+            {
+                SavesFolder = Path.Combine(projectPath, "Saves");
+                Debugger.Log("Saves folder : " + SavesFolder);
+            }
+
+            autoSplit   = gameObject.AddComponent<AutoSplit>();
+            gizmos      = gameObject.AddComponent<Gizmos>();
+            gm          = new GodMode();
+            uiEnabled   = true;
         }
     }
 }
