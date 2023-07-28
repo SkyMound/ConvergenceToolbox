@@ -10,13 +10,11 @@ using DS.Tech.UI;
 using DS.Game.Items;
 using DS.Tech.Util;
 using DS.Tech.ProjectSettings;
-using DS.Tech.Saves;
 
 namespace Tools
 {
     class AutoSplit : MonoBehaviour
-    {
-        readonly string path = @"C:\Windows\Temp\CTB_Debug.txt";
+    {    
         readonly string startingDoorNode = "P1L1_TUT_Gameplay_RoomDoor_Checkpoint_GameStart";
 
 
@@ -39,13 +37,6 @@ namespace Tools
 
         public void Start()
         {     
-            // This text is added only once to the file.
-                // Create a file to write to.
-            using (StreamWriter sw = File.CreateText(path))
-            {
-                sw.WriteLine("ConvergenceToolbox Debugger");
-                sw.WriteLine(ToolsLoader.GetVersionCTB());
-            }
 
             _refreshFrequence = 0.3f;
             _splitNumber = 0;
@@ -115,11 +106,7 @@ namespace Tools
                 // Connect to livesplit server 
                 _clientSocket.Connect("localhost", 16834);
 
-
-                using (StreamWriter sw = File.AppendText(path))
-                {
-                    sw.WriteLine("Connected to the server.");
-                }
+                Debugger.Log("Connected to the server.");
 
                 StartCoroutine(CheckSplits());
                 StartCoroutine(CheckPauses());
@@ -132,10 +119,7 @@ namespace Tools
             }
             catch (Exception ex)
             {
-                using (StreamWriter sw = File.AppendText(path))
-                {
-                    sw.WriteLine("Error: " + ex.ToString());
-                }
+                Debugger.Log("Error: " + ex.ToString());
             }
         }
 
@@ -151,19 +135,12 @@ namespace Tools
 
                 SBNetworkManager.Instance.Server_HeroesSpawned -= this.RetrieveServers;
                 SBNetworkManager.Instance.Server_HeroesSpawned -= this.CheckNewGameIsCreated;
-                
 
-                using (StreamWriter sw = File.AppendText(path))
-                {
-                    sw.WriteLine("Connection closed.");
-                }
+                Debugger.Log("Connection closed.");
             }
             catch (Exception ex)
             {
-                using (StreamWriter sw = File.AppendText(path))
-                {
-                    sw.WriteLine("Error: " + ex.ToString());
-                }
+                Debugger.Log("Error: " + ex.ToString());
             }
         }
 
@@ -215,18 +192,11 @@ namespace Tools
                 // Send the message to the server
                 _clientSocket.Send(buffer);
 
-
-                using (StreamWriter sw = File.AppendText(path))
-                {
-                    sw.WriteLine("Succesfully send " + message);
-                }
+                Debugger.Log("Succesfully send " + message);
             }
             catch (Exception ex)
             {
-                using (StreamWriter sw = File.AppendText(path))
-                {
-                    sw.WriteLine("Couldn't split:" + ex.ToString());
-                }
+                Debugger.Log("Couldn't split:" + ex.ToString());
             }
         }
 
@@ -261,10 +231,7 @@ namespace Tools
                     }
                     catch (Exception ex)
                     {
-                        using (StreamWriter sw = File.AppendText(path))
-                        {
-                            sw.WriteLine("Error in update: " + ex.ToString());
-                        }
+                        Debugger.Log("Error in update: " + ex.ToString());
                     }
                 }
                 yield return new WaitForSeconds(_refreshFrequence);
@@ -369,10 +336,7 @@ namespace Tools
             }
             catch (Exception ex)
             {
-                using (StreamWriter sw = File.AppendText(path))
-                {
-                    sw.WriteLine("Exception when checking:" + ex.ToString());
-                }
+                Debugger.Log("Exception when checking:" + ex.ToString());
                 return false;
             }
         }

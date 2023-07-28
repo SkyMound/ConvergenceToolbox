@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using System;
+using System.IO;
 using UnityEngine;
-using System.Reflection;
-using System.Diagnostics;
 
 namespace Tools
 {
@@ -16,8 +12,6 @@ namespace Tools
         public static void Init()
         {
             Load = new GameObject();
-            Load.AddComponent<AutoSplit>();
-            Load.AddComponent<Gizmos>();
             Load.AddComponent<ToolsManager>();
             GameObject.DontDestroyOnLoad(Load);
         }
@@ -27,9 +21,7 @@ namespace Tools
             GameObject.Destroy(Load);
         }
 
-        public static string GetVersionCTB()
-        {
-            return "CTB_1.0.0";
-        }
+        
+
     }
 }

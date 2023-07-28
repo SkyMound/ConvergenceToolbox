@@ -4,9 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.UIElements;
-using static UnityEngine.Rendering.DebugUI;
 
 namespace Tools
 {
@@ -27,6 +24,23 @@ namespace Tools
         public bool isEnabled;
         public bool isActive;
         public bool hasCreatedLine;
+
+
+        void Start()
+        {
+            lineRenderers = new List<LineRenderer>();
+            hasCreatedLine = false;
+            try
+            {
+                RetrieveShader();
+                SBNetworkManager.Instance.Server_HeroesSpawned += this.SetupHitbox;
+
+            }catch(Exception ex)
+            {
+                Debugger.Log("Error at Gizmos constructor : " + ex.ToString());
+            } 
+        }
+
 
         void SetupHitbox()
         {
@@ -74,10 +88,7 @@ namespace Tools
             }
             catch (Exception ex)
             {
-                using (StreamWriter sw = File.AppendText(path))
-                {
-                    sw.WriteLine("Error: " + ex.ToString());
-                }
+                Debugger.Log("Error: " + ex.ToString());
             }
 
         }
@@ -93,7 +104,8 @@ namespace Tools
 
                     if (mesh[i].material.shader.ToString().IndexOf("Flat", StringComparison.OrdinalIgnoreCase) >= 0 ||
                         mesh[i].material.shader.ToString().IndexOf("Color", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                        mesh[i].material.shader.ToString().IndexOf("Sprites/Default", StringComparison.OrdinalIgnoreCase) >= 0)
+                        mesh[i].material.shader.ToString().IndexOf("Sprites/Default", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                        mesh[i].material.shader.ToString().IndexOf("MultiAlpha_Unlit", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         shader = mesh[i].material.shader;
                         sw.WriteLine("Found : "+shader.name);
@@ -101,42 +113,11 @@ namespace Tools
                     }
                 }
             }
-            using (StreamWriter sw = File.AppendText(path))
-            {
-                sw.WriteLine("No shader found !");
-            }
+            Debugger.Log("No shader found !");
             return false;
         }
 
-        void Start()
-        {
-            lineRenderers = new List<LineRenderer>();
-            hasCreatedLine = false;
-            try
-            {
-                RetrieveShader();
-                SBNetworkManager.Instance.Server_HeroesSpawned += this.SetupHitbox;
-
-
-                // This text is added only once to the file.
-                if (!File.Exists(path))
-                {
-                    // Create a file to write to.
-                    using (StreamWriter sw = File.CreateText(path))
-                    {
-                        sw.WriteLine("ConvergenceToolbox Debugger");
-                    }
-                }
-            }catch(Exception ex)
-            {
-                using (StreamWriter sw = File.AppendText(path))
-                {
-                    sw.WriteLine("Error at Gizmos start : " + ex.ToString());
-                }
-            }
-            
-            
-        }
+        
 
         LineRenderer CreateLineRenderer(GameObject boundsContainer, Bounds bounds, Color color){
             LineRenderer lr = boundsContainer.AddComponent<LineRenderer>();
@@ -163,10 +144,7 @@ namespace Tools
 
         public void UpdateGizmos()
         {
-            using (StreamWriter sw = File.AppendText(path))
-            {
-                sw.WriteLine(isEnabled ? "Show Gizmos" : "Hide Gizmos"); // Debug
-            }
+            Debugger.Log(isEnabled ? "Show Gizmos" : "Hide Gizmos");
 
             isActive = isEnabled;
 
@@ -182,15 +160,8 @@ namespace Tools
             }
             else
             {
-                using (StreamWriter sw = File.AppendText(path))
-                {
-                    sw.WriteLine("Can't display !"); // Debug
-                }
+                Debugger.Log("Can't display !");
             }
         }
-
-
-        
-
     }
 }
