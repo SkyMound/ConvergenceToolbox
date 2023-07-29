@@ -75,15 +75,13 @@ namespace Tools
         public void CheckNewGameIsCreated()
         {
             if (UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.RespawnDoorNode.name.Equals(startingDoorNode)){
-                if(_isRunning)
-                    SendCommand(CommandType.Restart);
-                else
-                    SendCommand(CommandType.Start);
+                SendCommand(CommandType.Start);
             }
         }
 
         public void CheckFutureEkko3Defeated(UnityGuid itemID, int oldAmount, int newAmount)
         {
+            Debugger.Log("New Item");
             if (!itemID.IsValid() || newAmount <= oldAmount)
                 return;
             if(_isRunning && itemID == Configuration<AchievementConfig>.Instance.Asset.FutureEkko3DefeatedItemID)
@@ -152,13 +150,8 @@ namespace Tools
                 string message = "";
                 switch (type)
                 {
-                    case CommandType.Restart:
-                        message = "reset\r\nstarttimer\r\n";
-                        _splitNumber = 0;
-                        _isRunning = true;
-                        break;
                     case CommandType.Start:
-                        message += "starttimer\r\n";
+                        message += "reset\r\nstarttimer\r\n";
                         _splitNumber = 0;
                         _isRunning = true;
                         UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.MergedInventoryStacker.ItemAmountChanged += this.endOfRunListener;
@@ -349,7 +342,6 @@ namespace Tools
         Split,
         Stop,
         Pause,
-        Resume,
-        Restart
+        Resume
     }
 }
