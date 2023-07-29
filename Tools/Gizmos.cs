@@ -96,21 +96,17 @@ namespace Tools
         bool RetrieveShader(){
 
             MeshRenderer[] mesh = FindObjectsOfType<MeshRenderer>();
-            using (StreamWriter sw = File.AppendText(path))
+            for(int i = 0; i < mesh.Length; i++)
             {
-                for(int i = 0; i < mesh.Length; i++)
-                {
-                    sw.WriteLine(mesh[i].material.shader.name);
 
-                    if (mesh[i].material.shader.ToString().IndexOf("Flat", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                        mesh[i].material.shader.ToString().IndexOf("Color", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                        mesh[i].material.shader.ToString().IndexOf("Sprites/Default", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                        mesh[i].material.shader.ToString().IndexOf("MultiAlpha_Unlit", StringComparison.OrdinalIgnoreCase) >= 0)
-                    {
-                        shader = mesh[i].material.shader;
-                        sw.WriteLine("Found : "+shader.name);
-                        return true;
-                    }
+                if (mesh[i].material.shader.ToString().IndexOf("Flat", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    mesh[i].material.shader.ToString().IndexOf("Color", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    mesh[i].material.shader.ToString().IndexOf("Sprites/Default", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    mesh[i].material.shader.ToString().IndexOf("MultiAlpha_Unlit", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    shader = mesh[i].material.shader;
+                    Debugger.Log("Found : " + shader.name);
+                    return true;
                 }
             }
             Debugger.Log("No shader found !");
