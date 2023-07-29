@@ -74,8 +74,6 @@ namespace Tools
             Debugger.Init();
 
             StartCoroutine(Init());
-
-            
         }
 
         private IEnumerator Init()
@@ -93,7 +91,7 @@ namespace Tools
                         clientPipe.Connect();
                     }catch(Exception ex)
                     {
-                        Debugger.Log(".");
+                        Debugger.Log(". ("+ex.Message+")");
                     }
                     yield return null;
                 }

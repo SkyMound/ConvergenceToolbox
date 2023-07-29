@@ -9,8 +9,8 @@ namespace Tools
 {
     class GodMode
     {
-        DSApplicationBuildSettings defaultSettings;
-        DSApplicationBuildSettings godModeSettings;
+        readonly DSApplicationBuildSettings defaultSettings;
+        readonly DSApplicationBuildSettings godModeSettings;
         public bool isEnabled;
         public bool isActive;
 

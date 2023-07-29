@@ -81,7 +81,6 @@ namespace Tools
 
         public void CheckFutureEkko3Defeated(UnityGuid itemID, int oldAmount, int newAmount)
         {
-            Debugger.Log("New Item");
             if (!itemID.IsValid() || newAmount <= oldAmount)
                 return;
             if(_isRunning && itemID == Configuration<AchievementConfig>.Instance.Asset.FutureEkko3DefeatedItemID)
