@@ -11,6 +11,7 @@ namespace Tools
         AutoSplit autoSplit;
         Gizmos gizmos;
         GodMode gm;
+        AbilityLogger logger;
         bool uiEnabled;
 
         public string Version { get; private set; } = "1.1.0";
@@ -111,6 +112,7 @@ namespace Tools
 
             autoSplit   = gameObject.AddComponent<AutoSplit>();
             gizmos      = gameObject.AddComponent<Gizmos>();
+            logger      = gameObject.AddComponent<AbilityLogger>();
             gm          = new GodMode();
             uiEnabled   = true;
         }

@@ -9,7 +9,6 @@ namespace Tools
 {
     public class Gizmos : MonoBehaviour
     {
-        readonly string path = @"C:\Windows\Temp\CTB_Debug.txt";
         readonly Color cutsceneColor = Color.blue;
         readonly Color checkpointColor = Color.white;
         readonly Color roomDoorColor = Color.green;
