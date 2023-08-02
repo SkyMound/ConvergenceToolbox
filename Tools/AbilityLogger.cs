@@ -10,6 +10,9 @@ namespace Tools
     public class AbilityLogger : MonoBehaviour
     {
         GUIStyle _textStyle;
+        int _currentTick;
+        public bool isEnabled;
+        int TickFade = 60;
 
         void OnGUI()
         {
@@ -29,9 +32,18 @@ namespace Tools
             this._textStyle.normal.textColor = Color.white;
         }
 
-        CommandFrame GetCommandFrame()
+        IEnumerator UpdateCommandFrame()
         {
-            int tick = NetworkTime.SimulationNetworkClock.Tick;
+            while (isEnabled)
+            {
+                this._currentTick = NetworkTime.SimulationNetworkClock.Tick;
+                CommandFrame currentFrame = GetCommandFrame(this._currentTick);
+                yield return null;
+            }
+        }
+
+        CommandFrame GetCommandFrame(int tick)
+        {
             return NetworkHeroManager.Instance.NetworkHero.Player.NetworkPlayerInput.ServerCommandFrameReceiver.GetCommandFrameAtTick(tick);
         }
 
@@ -39,6 +51,12 @@ namespace Tools
         void Update()
         {
             
+        }
+
+        class Ability
+        {
+            string name;
+            GUIStyle _textStyle;
         }
     }
 }
