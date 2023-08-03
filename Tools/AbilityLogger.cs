@@ -9,27 +9,28 @@ namespace Tools
 {
     public class AbilityLogger : MonoBehaviour
     {
-        GUIStyle _textStyle;
-        int _currentTick;
+
+        int _currentTick = 0;
         public bool isEnabled;
         int TickFade = 60;
+        List<Ability> abilitiesDisplayed = new List<Ability>();
 
         void OnGUI()
         {
-            GUI.Label(new Rect((float)Screen.width-150, (float)Screen.height-25 , 150, 25), "ABCDE", this._textStyle);
-
+            for(int i = 0; i < abilitiesDisplayed.Count; i++)
+            {
+                GUI.Label(new Rect((float)Screen.width-(30*(i+1)), (float)Screen.height-30 , 30, 30), abilitiesDisplayed[i].name, abilitiesDisplayed[i].textStyle);
+            }
         }
 
 
         void Start()
         {
             Debugger.Log("Ability Logger");
-    
-            Font font = AssetBundleMap.Instance.LoadAsset<Font>("Assets/DS.Game.Updraft/UI/Fonts_RestOfWorld/FontAssets/FSLola-Medium.otf");
-            this._textStyle = new GUIStyle();
-            this._textStyle.font = font;
-            this._textStyle.fontSize = 30;
-            this._textStyle.normal.textColor = Color.white;
+            isEnabled = true;
+            abilitiesDisplayed.Add(new Ability("T", _currentTick));
+            StartCoroutine(UpdateCommandFrame());
+            
         }
 
         IEnumerator UpdateCommandFrame()
@@ -38,6 +39,23 @@ namespace Tools
             {
                 this._currentTick = NetworkTime.SimulationNetworkClock.Tick;
                 CommandFrame currentFrame = GetCommandFrame(this._currentTick);
+
+                if (currentFrame.AcrobaticPressed)
+                {
+                    Debugger.Log("A");
+                    abilitiesDisplayed.Add(new Ability("A", _currentTick));
+                }
+                if (currentFrame.BasicAttackPressed)
+                {
+                    Debugger.Log("BA");
+                    abilitiesDisplayed.Add(new Ability("BA", _currentTick));
+                }
+                if (currentFrame.TimewinderPressed)
+                {
+                    Debugger.Log("TW");
+                    abilitiesDisplayed.Add(new Ability("TW", _currentTick));
+                }
+                Debugger.Log(this._currentTick.ToString());
                 yield return null;
             }
         }
@@ -55,8 +73,23 @@ namespace Tools
 
         class Ability
         {
-            string name;
-            GUIStyle _textStyle;
+            readonly Font font = AssetBundleMap.Instance.LoadAsset<Font>("Assets/DS.Game.Updraft/UI/Fonts_RestOfWorld/FontAssets/FSLola-Medium.otf");
+
+            public string name;
+            public GUIStyle textStyle;
+            int tick;
+
+            public Ability(string name, int tickWhenPressed)
+            {
+                Debugger.Log("New Ability created");
+                this.textStyle = new GUIStyle();
+                this.textStyle.font = font;
+                this.textStyle.fontSize = 30;
+                this.textStyle.normal.textColor = Color.white;
+                this.name = name;
+                this.tick = tickWhenPressed;
+            }
+             
         }
     }
 }
