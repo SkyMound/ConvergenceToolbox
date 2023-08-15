@@ -13,8 +13,9 @@ namespace Tools
 
         int _currentTick = 0;
         public bool isEnabled;
-        int TickFade = 60;
-        List<Ability> abilitiesDisplayed = new List<Ability>();
+        DisplayedAbilities abilitiesDisplayed = new DisplayedAbilities();
+        NetworkPlayerSync playerSync;
+        ICommandFrameSource CommandFrameSource;
 
         int horizontalMargin = 50;
         
@@ -31,6 +32,8 @@ namespace Tools
         {
             Debugger.Log("Ability Logger");
             isEnabled = true;
+            this.playerSync = FindObjectOfType<NetworkPlayerSync>();
+            this.CommandFrameSource = new ControllerInputHandler();
             StartCoroutine(UpdateCommandFrame());
 
         }
@@ -45,18 +48,18 @@ namespace Tools
                     {
                         if (!abilitiesDisplayed[index].holding)
                         {
-                            abilitiesDisplayed.Insert(0,ability);
+                            abilitiesDisplayed.InsertAbility(ability);
                         }
                     }
                     else
                     {
-                        abilitiesDisplayed.Insert(0,ability);
+                        abilitiesDisplayed.InsertAbility(ability);
                     }
                 }else{
                     int index = abilitiesDisplayed.IndexOf(ability);
                     if (index != -1 && abilitiesDisplayed[index].holding)
                     {
-                        abilitiesDisplayed[index].released();
+                        abilitiesDisplayed[index].Released();
                     }
                 }
             });
@@ -70,7 +73,7 @@ namespace Tools
                 {
 
                     this._currentTick = NetworkTime.SimulationNetworkClock.Tick;
-                    CommandFrame currentFrame = GetCommandFrame(this._currentTick);
+                    CommandFrame currentFrame = this.CommandFrameSource.GetCommandFrame(this.playerSync,this._currentTick);
 
                     List<Ability> abilitiesFrame = new List<Ability>();
                     abilitiesFrame.Add(new Ability("BA", currentFrame.BasicAttackHeld, _currentTick));
@@ -88,9 +91,8 @@ namespace Tools
                     UpdateAbilitiesDisplayed(abilitiesFrame);
                 }catch(Exception ex)
                 {
-                    Debugger.Log(ex.Message);
+                    //Debugger.Log(ex.Message);
                 }
-                //Debugger.Log(this._currentTick.ToString());
                 yield return null;
             }
         }
@@ -102,25 +104,6 @@ namespace Tools
                 Debugger.Log(abilities[i].ToString());
             }
         }
-
-        CommandFrame GetCommandFrame(int tick)
-        {
-            try
-            {
-                return NetworkHeroManager.Instance.NetworkHero.Player.NetworkPlayerInput.ServerCommandFrameReceiver.GetCommandFrameAtTick(tick);
-            }catch(Exception ex)
-            {
-                return default;
-            }
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-           
-        }
-
-
 
         class Ability : IEquatable<Ability>
         {
@@ -147,7 +130,7 @@ namespace Tools
                 return this.name == other.name;
             }
 
-            public void released()
+            public void Released()
             {
                 this.holding = false;
                 this.textStyle.normal.textColor = Color.gray;
@@ -156,6 +139,32 @@ namespace Tools
             public override string ToString()
             {
                 return this.name + ':'+ this.holding.ToString();
+            }
+        }
+
+
+        class DisplayedAbilities : List<Ability>
+        {
+            readonly int maxAbility = 7;
+
+            public void InsertAbility(Ability ability)
+            {
+                try
+                { 
+                    this.Insert(0, ability);
+                    int idx = this.Count-1;
+                    while(this.Count > maxAbility && idx >= 0)
+                    {
+                        if (!this[idx].holding)
+                        {
+                            this.RemoveAt(idx);
+                        }
+                        idx--;
+                    }
+                }catch(Exception ex)
+                {
+                    Debugger.Log(ex.Message);
+                }
             }
         }
     }
