@@ -76,6 +76,14 @@ namespace Tools
                     abilitiesFrame.Add(new Ability("BA", currentFrame.BasicAttackHeld, _currentTick));
                     abilitiesFrame.Add(new Ability("A", currentFrame.AcrobaticHeld, _currentTick));
                     abilitiesFrame.Add(new Ability("TW", currentFrame.TimewinderHeld, _currentTick));
+                    abilitiesFrame.Add(new Ability("PD", currentFrame.PhaseDiveHeld, _currentTick));
+                    abilitiesFrame.Add(new Ability("TP", currentFrame.TemporalPulseHeld, _currentTick));
+                    abilitiesFrame.Add(new Ability("R", currentFrame.RewindHeld, _currentTick));
+                    abilitiesFrame.Add(new Ability("J", currentFrame.JumpHeld, _currentTick));
+                    abilitiesFrame.Add(new Ability("PC", currentFrame.ParallelConvergenceHeld, _currentTick));
+                    abilitiesFrame.Add(new Ability("CB", currentFrame.ChronobreakPressed, _currentTick));
+                    abilitiesFrame.Add(new Ability("D", currentFrame.DodgeHeld, _currentTick));
+
 
                     UpdateAbilitiesDisplayed(abilitiesFrame);
                 }catch(Exception ex)
