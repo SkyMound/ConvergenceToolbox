@@ -14,7 +14,7 @@ namespace Tools
         AbilityLogger logger;
         bool uiEnabled;
 
-        public string Version { get; private set; } = "1.1.0";
+        public string Version { get; private set; } = "1.2.0";
         public string steamID { get; private set;} = "317573976";
         public string SavesFolder { get; private set; }
         public string SteamSavesFolder {get; private set;}
