@@ -387,6 +387,7 @@
     <Compile Include="Gizmos.cs" />
     <Compile Include="Debugger.cs" />
     <Compile Include="AbilityLogger.cs" />
+    <Compile Include="AdvancedMechanics.cs" />
     <Compile Include="ToolsLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ToolsManager.cs" />

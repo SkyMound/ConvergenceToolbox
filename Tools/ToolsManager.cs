@@ -12,9 +12,10 @@ namespace Tools
         Gizmos gizmos;
         GodMode gm;
         AbilityLogger logger;
+        AdvancedMechanics mechanics;
         bool uiEnabled;
 
-        public string Version { get; private set; } = "1.2.0";
+        public string Version { get; private set; } = "1.3.0";
         public string steamID { get; private set;} = "317573976";
         public string SavesFolder { get; private set; }
         public string SteamSavesFolder {get; private set;}
@@ -118,6 +119,7 @@ namespace Tools
             autoSplit   = gameObject.AddComponent<AutoSplit>();
             gizmos      = gameObject.AddComponent<Gizmos>();
             logger      = gameObject.AddComponent<AbilityLogger>();
+            mechanics   = gameObject.AddComponent<AdvancedMechanics>();
             gm          = new GodMode();
             uiEnabled   = true;
         }
