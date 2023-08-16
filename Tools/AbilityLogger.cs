@@ -17,21 +17,27 @@ namespace Tools
         NetworkPlayerSync playerSync;
         ICommandFrameSource CommandFrameSource;
 
-        int horizontalMargin = 50;
+        
         
         void OnGUI()
         {
-            for(int i = 0; i < abilitiesDisplayed.Count; i++)
+            int currentShift = 40;
+            for (int i = 0; i < abilitiesDisplayed.Count; i++)
             {
-                GUI.Label(new Rect((float)Screen.width-(horizontalMargin * (i+1)), (float)Screen.height-30 , 30, 30), abilitiesDisplayed[i].name, abilitiesDisplayed[i].textStyle);
+                currentShift += abilitiesDisplayed[i].margin;
+                GUI.Label(new Rect((float)Screen.width-currentShift, (float)Screen.height-40 , 40, 40), abilitiesDisplayed[i].name, abilitiesDisplayed[i].textStyle);
             }
         }
 
+        public void RetrieveServers()
+        {
+            this.playerSync = FindObjectOfType<NetworkPlayerSync>();
+        }
 
         void Start()
         {
-            Debugger.Log("Ability Logger");
             isEnabled = true;
+            SBNetworkManager.Instance.Server_HeroesSpawned += this.RetrieveServers;
             this.playerSync = FindObjectOfType<NetworkPlayerSync>();
             this.CommandFrameSource = new ControllerInputHandler();
             StartCoroutine(UpdateCommandFrame());
@@ -111,14 +117,16 @@ namespace Tools
 
             public string name;
             public GUIStyle textStyle;
+            public int margin;
             int tick;
             public bool holding;
 
             public Ability(string name, bool pressed ,int tickWhenPressed)
             {
                 this.textStyle = new GUIStyle();
+                this.margin = name.Length == 1 ? 35 : 60;
                 this.textStyle.font = font;
-                this.textStyle.fontSize = 30;
+                this.textStyle.fontSize = 40;
                 this.textStyle.normal.textColor = pressed ? Color.white : Color.gray;
                 this.name = name;
                 this.holding = pressed;
