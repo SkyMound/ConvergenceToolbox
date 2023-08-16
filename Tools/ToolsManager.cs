@@ -11,9 +11,10 @@ namespace Tools
         AutoSplit autoSplit;
         Gizmos gizmos;
         GodMode gm;
+        AbilityLogger logger;
         bool uiEnabled;
 
-        public string Version { get; private set; } = "1.1.0";
+        public string Version { get; private set; } = "1.2.0";
         public string steamID { get; private set;} = "317573976";
         public string SavesFolder { get; private set; }
         public string SteamSavesFolder {get; private set;}
@@ -50,21 +51,26 @@ namespace Tools
                 else if (!autoSplit.isEnabled && autoSplit.isActive)
                     autoSplit.StopAutoSplit();
 
-                if(!autoSplit.isEnabled){
+                // Ability Logger checkbox
+                logger.isEnabled = GUI.Toggle(new Rect(10, 50, 150, 20), logger.isEnabled, "Show Abilities");
+                if (logger.isEnabled != logger.isActive)
+                    logger.ToggleAbilityLogger();
+
+                if (!autoSplit.isEnabled){
 
                     // Gizmos checkbox
-                    gizmos.isEnabled = GUI.Toggle(new Rect(10, 50, 150, 20), gizmos.isEnabled, "Show Gizmos");
+                    gizmos.isEnabled = GUI.Toggle(new Rect(10, 70, 150, 20), gizmos.isEnabled, "Show Gizmos");
 
                     if (gizmos.isEnabled != gizmos.isActive)
                         gizmos.UpdateGizmos();
 
                     // GodMode checkbox
-                    gm.isEnabled = GUI.Toggle(new Rect(10, 70, 150, 20), gm.isEnabled, "Enable GodMode");
+                    gm.isEnabled = GUI.Toggle(new Rect(10, 90, 150, 20), gm.isEnabled, "Enable GodMode");
                     if (gm.isEnabled != gm.isActive)
                         gm.ToggleGodMode();
                 }
 
-            
+                
             }
         }
 
@@ -111,6 +117,7 @@ namespace Tools
 
             autoSplit   = gameObject.AddComponent<AutoSplit>();
             gizmos      = gameObject.AddComponent<Gizmos>();
+            logger      = gameObject.AddComponent<AbilityLogger>();
             gm          = new GodMode();
             uiEnabled   = true;
         }
