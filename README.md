@@ -37,11 +37,10 @@ Let's now see how to setup the Autsplit with LiveSplit.
 - Gizmos 
     - Hitbox trigger for Checkpoint, Battle, Cutscene and Level Loader.
 - God Mode (Unlock lots of cheats and utilities build by the developpers to debug the game)
+- Abilites logger (display on screen abilites pressed and held)
 
 ## Upcoming
 - In-game Tips/Tricks
-- Camera control
-- Abilites logger
 
 # Contributing
 
