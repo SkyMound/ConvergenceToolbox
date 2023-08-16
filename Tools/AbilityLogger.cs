@@ -13,6 +13,7 @@ namespace Tools
 
         int _currentTick = 0;
         public bool isEnabled;
+        public bool isActive;
         DisplayedAbilities abilitiesDisplayed = new DisplayedAbilities();
         NetworkPlayerSync playerSync;
         ICommandFrameSource CommandFrameSource;
@@ -21,11 +22,14 @@ namespace Tools
         
         void OnGUI()
         {
-            int currentShift = 40;
-            for (int i = 0; i < abilitiesDisplayed.Count; i++)
+            if (isEnabled)
             {
-                currentShift += abilitiesDisplayed[i].margin;
-                GUI.Label(new Rect((float)Screen.width-currentShift, (float)Screen.height-40 , 40, 40), abilitiesDisplayed[i].name, abilitiesDisplayed[i].textStyle);
+                int currentShift = 40;
+                for (int i = 0; i < abilitiesDisplayed.Count; i++)
+                {
+                    currentShift += abilitiesDisplayed[i].margin;
+                    GUI.Label(new Rect((float)Screen.width-currentShift, (float)Screen.height-40 , 40, 40), abilitiesDisplayed[i].name, abilitiesDisplayed[i].textStyle);
+                }
             }
         }
 
@@ -38,11 +42,22 @@ namespace Tools
         {
             isEnabled = true;
             SBNetworkManager.Instance.Server_HeroesSpawned += this.RetrieveServers;
-            this.playerSync = FindObjectOfType<NetworkPlayerSync>();
-            this.CommandFrameSource = new ControllerInputHandler();
-            StartCoroutine(UpdateCommandFrame());
-
+            ToggleAbilityLogger();
         }
+
+        public void ToggleAbilityLogger()
+        {
+            isActive = isEnabled;
+
+            if (isEnabled)
+            {
+                this.playerSync = FindObjectOfType<NetworkPlayerSync>();
+                this.CommandFrameSource = new ControllerInputHandler();
+                abilitiesDisplayed.Clear();
+                StartCoroutine(UpdateCommandFrame());
+            }
+        }
+
 
         void UpdateAbilitiesDisplayed(List<Ability> abilitiesFrame) {
             abilitiesFrame.ForEach(ability =>
@@ -92,7 +107,6 @@ namespace Tools
                     abilitiesFrame.Add(new Ability("PC", currentFrame.ParallelConvergenceHeld, _currentTick));
                     abilitiesFrame.Add(new Ability("CB", currentFrame.ChronobreakPressed, _currentTick));
                     abilitiesFrame.Add(new Ability("D", currentFrame.DodgeHeld, _currentTick));
-
 
                     UpdateAbilitiesDisplayed(abilitiesFrame);
                 }catch(Exception ex)
