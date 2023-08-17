@@ -1,21 +1,42 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Tools
 {
     public class AdvancedMechanics : MonoBehaviour
     {
         Camera camera;
-
+        GameObject dropdown;
+        
         // Use this for initialization
         void Start()
         {
             try
             {
+                
 
                 // Will attach a VideoPlayer to the main camera.
                 this.camera = FindObjectOfType<Camera>();
+                dropdown = new GameObject();
+                TMP_Dropdown dp = dropdown.AddComponent<TMP_Dropdown>();
+                RectTransform rect = dropdown.AddComponent<RectTransform>();
+                
+
+                dropdown.AddComponent<CanvasRenderer>();
+                dropdown.AddComponent<Image>();
+                dropdown.transform.position = this.camera.transform.position;
+                List<string> list = new List<string> { "Roll Cancel", "Whirlwinder", "Nitro Jump" };
+                
+                dp.AddOptions(list);
+                dp.useGUILayout = true;
+                dp.Show();
+
+
+
 
                 // VideoPlayer automatically targets the camera backplane when it is added
                 // to a camera object, no need to change videoPlayer.targetCamera.
@@ -33,22 +54,14 @@ namespace Tools
                 // Here, using absolute.
                 videoPlayer.url = "D:/Vidéyo/cleeeaaan.mp4";
 
-
                 // Restart from beginning when done.
                 videoPlayer.isLooping = false;
-
-                // Start playback. This means the VideoPlayer may have to prepare (reserve
-                // resources, pre-load a few frames, etc.). To better control the delays
-                // associated with this preparation one can use videoPlayer.Prepare() along with
-                // its prepareCompleted event.
-                Debugger.Log(videoPlayer.isPlaying.ToString());
 
                 // Each time we reach the end, we slow down the playback by a factor of 10.
                 videoPlayer.loopPointReached += EndReached;
 
-                videoPlayer.Play();
+                //videoPlayer.Play();
 
-                Debugger.Log(videoPlayer.isPlaying.ToString());
             }catch(Exception ex)
             {
                 Debugger.Log(ex.Message);
@@ -57,13 +70,22 @@ namespace Tools
 
         void EndReached(UnityEngine.Video.VideoPlayer vp)
         {
-            vp.enabled = false;
+            vp.Stop();
+            // vp.enabled = false;
         }
 
         // Update is called once per frame
         void Update()
         {
 
+        }
+
+        class MyDropdown : Dropdown
+        {
+            public MyDropdown()
+            {
+                
+            }
         }
     }
 }
