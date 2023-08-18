@@ -41,6 +41,7 @@ Let's now see how to setup the Autsplit with LiveSplit.
 
 ## Upcoming
 - In-game Tips/Tricks
+- Route suggestion/creation and sharing
 
 # Contributing
 
