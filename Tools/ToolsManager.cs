@@ -12,6 +12,7 @@ namespace Tools
         Gizmos gizmos;
         GodMode gm;
         AbilityLogger logger;
+        RouteManager route;
         bool uiEnabled;
 
         public string Version { get; private set; } = "1.2.0";
@@ -118,6 +119,7 @@ namespace Tools
             autoSplit   = gameObject.AddComponent<AutoSplit>();
             gizmos      = gameObject.AddComponent<Gizmos>();
             logger      = gameObject.AddComponent<AbilityLogger>();
+            route       = gameObject.AddComponent<RouteManager>();
             gm          = new GodMode();
             uiEnabled   = true;
         }
