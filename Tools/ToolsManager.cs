@@ -17,7 +17,7 @@ namespace Tools
 
         public string Version { get; private set; } = "1.2.0";
         public string steamID { get; private set;} = "317573976";
-        public string SavesFolder { get; private set; }
+        public static string RoutesFolder { get; private set; }
         public string SteamSavesFolder {get; private set;}
 
         private static ToolsManager _instance;
@@ -112,8 +112,8 @@ namespace Tools
 
             if (!string.IsNullOrEmpty(projectPath))
             {
-                SavesFolder = Path.Combine(projectPath, "Saves");
-                Debugger.Log("Saves folder : " + SavesFolder);
+                RoutesFolder = Path.Combine(projectPath, "Routes");
+                Debugger.Log("Saves folder : " + RoutesFolder);
             }
 
             autoSplit   = gameObject.AddComponent<AutoSplit>();
