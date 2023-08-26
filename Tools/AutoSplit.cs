@@ -116,6 +116,8 @@ namespace Tools
             }
             catch (Exception ex)
             {
+                isActive = false;
+                isEnabled = false;
                 Debugger.Log("Error: " + ex.ToString());
             }
         }
