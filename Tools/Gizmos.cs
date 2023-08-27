@@ -16,9 +16,7 @@ namespace Tools
 
         Battle_Server[] battleServers;
         BoxCollider2D[] hitboxes;
-        List<LineRenderer> lineRenderers;
-        Shader shader;
-        
+        List<LineRenderer> lineRenderers;        
 
         public bool isEnabled;
         public bool isActive;
@@ -31,7 +29,6 @@ namespace Tools
             hasCreatedLine = false;
             try
             {
-                RetrieveShader();
                 SBNetworkManager.Instance.Server_HeroesSpawned += this.SetupHitbox;
 
             }catch(Exception ex)
@@ -46,11 +43,7 @@ namespace Tools
             hasCreatedLine = false;
             try
             {
-                if (shader == null)
-                    if(!RetrieveShader())
-                        return;
-
-                if (!isEnabled)
+                if (!isEnabled || ToolsManager.Instance.shader == null)
                     return;
 
                 lineRenderers = new List<LineRenderer>();
@@ -90,29 +83,7 @@ namespace Tools
                 Debugger.Log("Error: " + ex.ToString());
             }
 
-        }
-
-        bool RetrieveShader(){
-
-            MeshRenderer[] mesh = FindObjectsOfType<MeshRenderer>();
-            for(int i = 0; i < mesh.Length; i++)
-            {
-
-                if (mesh[i].material.shader.ToString().IndexOf("Flat", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                    mesh[i].material.shader.ToString().IndexOf("Color", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                    mesh[i].material.shader.ToString().IndexOf("Sprites/Default", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                    mesh[i].material.shader.ToString().IndexOf("MultiAlpha_Unlit", StringComparison.OrdinalIgnoreCase) >= 0)
-                {
-                    shader = mesh[i].material.shader;
-                    Debugger.Log("Found : " + shader.name);
-                    return true;
-                }
-            }
-            Debugger.Log("No shader found !");
-            return false;
-        }
-
-        
+        }        
 
         LineRenderer CreateLineRenderer(GameObject boundsContainer, Bounds bounds, Color color){
             LineRenderer lr = boundsContainer.AddComponent<LineRenderer>();
@@ -131,7 +102,7 @@ namespace Tools
             positions[3] = bounds.center + new Vector3(bounds.extents.x, -bounds.extents.y, 0);
 
             lr.SetPositions(positions);
-            lr.material.shader = shader;
+            lr.material.shader = ToolsManager.Instance.shader;
             lr.material.color = color;
 
             return lr;

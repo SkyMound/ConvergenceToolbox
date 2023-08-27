@@ -13,11 +13,12 @@ namespace Tools
         GodMode gm;
         AbilityLogger logger;
         RouteManager route;
+        public Shader shader;
         bool uiEnabled;
 
         public string Version { get; private set; } = "1.2.0";
         public string steamID { get; private set;} = "317573976";
-        public static string RoutesFolder { get; private set; }
+        public string RoutesFolder { get; private set; }
         public string SteamSavesFolder {get; private set;}
 
         private static ToolsManager _instance;
@@ -116,6 +117,9 @@ namespace Tools
                 Debugger.Log("Saves folder : " + RoutesFolder);
             }
 
+            RetrieveShader();
+            SBNetworkManager.Instance.Server_HeroesSpawned += RetrieveShader();
+
             autoSplit   = gameObject.AddComponent<AutoSplit>();
             gizmos      = gameObject.AddComponent<Gizmos>();
             logger      = gameObject.AddComponent<AbilityLogger>();
@@ -123,5 +127,28 @@ namespace Tools
             gm          = new GodMode();
             uiEnabled   = true;
         }
+
+        public bool RetrieveShader()
+        {
+
+            MeshRenderer[] mesh = FindObjectsOfType<MeshRenderer>();
+            for (int i = 0; i < mesh.Length; i++)
+            {
+
+                if (mesh[i].material.shader.ToString().IndexOf("Flat", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    mesh[i].material.shader.ToString().IndexOf("Color", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    mesh[i].material.shader.ToString().IndexOf("Sprites/Default", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    mesh[i].material.shader.ToString().IndexOf("MultiAlpha_Unlit", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    shader = mesh[i].material.shader;
+                    Debugger.Log("Found : " + shader.name);
+                    return true;
+                }
+            }
+            Debugger.Log("No shader found !");
+            return false;
+        }
     }
+
+
 }
