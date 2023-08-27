@@ -3,6 +3,7 @@ using UnityEngine;
 using System.IO;
 using System.IO.Pipes;
 using System;
+using DS.Game.Luna;
 
 namespace Tools
 {
@@ -118,7 +119,7 @@ namespace Tools
             }
 
             RetrieveShader();
-            SBNetworkManager.Instance.Server_HeroesSpawned += RetrieveShader();
+            SBNetworkManager.Instance.Server_HeroesSpawned += RetrieveShader;
 
             autoSplit   = gameObject.AddComponent<AutoSplit>();
             gizmos      = gameObject.AddComponent<Gizmos>();
@@ -128,7 +129,7 @@ namespace Tools
             uiEnabled   = true;
         }
 
-        public bool RetrieveShader()
+        public void RetrieveShader()
         {
 
             MeshRenderer[] mesh = FindObjectsOfType<MeshRenderer>();
@@ -142,11 +143,10 @@ namespace Tools
                 {
                     shader = mesh[i].material.shader;
                     Debugger.Log("Found : " + shader.name);
-                    return true;
+                    return;
                 }
             }
             Debugger.Log("No shader found !");
-            return false;
         }
     }
 

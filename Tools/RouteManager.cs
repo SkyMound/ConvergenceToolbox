@@ -67,7 +67,7 @@ namespace Tools
             }
             if (Input.GetKeyDown(KeyCode.Delete))
             {
-
+                currentRoute.GetCurrentSegment().RemovePoint();
             }
         }
         /*
@@ -91,8 +91,6 @@ namespace Tools
     public class Route
     {
 
-        Shader shader;
-
         public string name;
         public Color color;
         public string author;
@@ -105,13 +103,13 @@ namespace Tools
             try
             {
 
-                //shader = Resources.Load<Shader>("Shader Graphs/MultiAlpha_Unlit");
-                //Debugger.Log("Shader" + shader.ToString());
                 lr = routeHolder.AddComponent<LineRenderer>();
                 lr.sortingOrder = 32000;
                 lr.alignment = LineAlignment.View;
                 lr.startWidth = 0.07f;
                 lr.endWidth = 0.07f;
+                lr.material.shader = ToolsManager.Instance.shader;
+                lr.material.color = color;
                 segmentIndex = 0;
                 segments = new List<Segment>();
                 this.name = name;
@@ -160,6 +158,7 @@ namespace Tools
         public string name;
         int pointIndex;
         readonly Action refresh;
+        GameObject sphere;
 
         public Segment(Action RefreshRoute) : base()
         {
@@ -170,7 +169,14 @@ namespace Tools
         public void AddPoint(Vector3 coord)
         {
             Insert(pointIndex, coord);
-            pointIndex++;
+            NextPoint();
+            refresh();
+        }
+
+        public void RemovePoint()
+        {
+            LastPoint();
+            RemoveAt(pointIndex);
             refresh();
         }
 
@@ -178,12 +184,38 @@ namespace Tools
         {
             if(pointIndex<Count)
                 pointIndex++;
+
+            RefreshPoint();
         }
 
         public void LastPoint()
         {
             if (pointIndex > 0)
                 pointIndex--;
+
+            RefreshPoint();
+        }
+
+        void RefreshPoint()
+        {
+            try
+            {
+
+                if (sphere == null)
+                {
+
+                    sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    sphere.transform.localScale = new Vector3(.7f, .7f, .7f);
+                    sphere.GetComponent<MeshRenderer>().material.shader = ToolsManager.Instance.shader;
+                    sphere.GetComponent<MeshRenderer>().material.color = Color.blue;
+                }
+
+                sphere.transform.position = this[pointIndex-1];
+                Debugger.Log("Sphere to " + this[pointIndex - 1].ToString());
+            }catch(Exception ex)
+            {
+                Debugger.Log(ex.Message);
+            }
         }
     }   
 }
