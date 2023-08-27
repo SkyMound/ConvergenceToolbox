@@ -5,6 +5,7 @@ using UnityEngine;
 using System.IO;
 using System;
 using DS.Game.Luna;
+using DS.Tech.App;
 
 namespace Tools
 {
@@ -54,15 +55,15 @@ namespace Tools
             }
             if (Input.GetKeyDown(KeyCode.UpArrow))
             {
-                currentRoute.NextPoint();
+                currentRoute.GetCurrentSegment().NextPoint();
             }
-            if (Input.GetKeyDown(KeyCode.UpArrow))
+            if (Input.GetKeyDown(KeyCode.DownArrow))
             {
-                currentRoute.LastPoint();
+                currentRoute.GetCurrentSegment().LastPoint();
             }
             if (Input.GetKeyDown(KeyCode.Insert))
             {
-                currentRoute.AddPoint(hero.transform.position + new Vector3(0,1,0));
+                currentRoute.GetCurrentSegment().AddPoint(hero.transform.position + new Vector3(0,1,0));
             }
             if (Input.GetKeyDown(KeyCode.Delete))
             {
@@ -89,6 +90,9 @@ namespace Tools
 
     public class Route
     {
+
+        Shader shader;
+
         public string name;
         public Color color;
         public string author;
@@ -98,49 +102,56 @@ namespace Tools
 
         public Route(GameObject routeHolder, string name, Color color, string author)
         {
-            lr = routeHolder.AddComponent<LineRenderer>();
-            lr.sortingOrder = 32000;
-            lr.alignment = LineAlignment.View;
-            lr.startWidth = 0.07f;
-            lr.endWidth = 0.07f;
-            segmentIndex = 0;
-            segments = new List<Segment>();
-            this.name = name;
-            this.color = color;
-            this.author = author;
+            try
+            {
+
+                //shader = Resources.Load<Shader>("Shader Graphs/MultiAlpha_Unlit");
+                //Debugger.Log("Shader" + shader.ToString());
+                lr = routeHolder.AddComponent<LineRenderer>();
+                lr.sortingOrder = 32000;
+                lr.alignment = LineAlignment.View;
+                lr.startWidth = 0.07f;
+                lr.endWidth = 0.07f;
+                segmentIndex = 0;
+                segments = new List<Segment>();
+                this.name = name;
+                this.color = color;
+                this.author = author;
+            }catch(Exception ex)
+            {
+                Debugger.Log(ex.Message);
+            }
         }
 
         public Segment GetCurrentSegment()
         {
             if (segmentIndex >= segments.Count)
-            {
-                Segment newSeg = new Segment(lr);
-                segments.Add(newSeg);
-                return newSeg;
-            }
-            else
-            {
-                return segments[segmentIndex];
-            }
+                segments.Add(new Segment(RefreshRoute));
+            return segments[segmentIndex];
         }
 
         public void NextSegment()
         {
             segmentIndex++;
             if (segmentIndex == segments.Count)
-            { 
-                Segment newSeg = new Segment(lr);
-                segments.Add(newSeg);
-            }
+                segments.Add(new Segment(RefreshRoute));
+
+            RefreshRoute();
         }
 
         public void LastSegment()
         {
             if (segmentIndex > 0)
                 segmentIndex--;
-            lr.positionCount = segments[segmentIndex].Count;
+
+            RefreshRoute();
         }
 
+        public void RefreshRoute()
+        {
+            lr.positionCount = GetCurrentSegment().Count;
+            lr.SetPositions(GetCurrentSegment().ToArray());
+        }
 
     }
 
@@ -148,20 +159,19 @@ namespace Tools
     {
         public string name;
         int pointIndex;
-        LineRenderer lr;
+        readonly Action refresh;
 
-        public Segment(LineRenderer lineRenderer) : base()
+        public Segment(Action RefreshRoute) : base()
         {
             pointIndex = 0;
-            lr = lineRenderer;
+            refresh = RefreshRoute;
         }
 
         public void AddPoint(Vector3 coord)
         {
             Insert(pointIndex, coord);
             pointIndex++;
-            lr.positionCount = Count;
-            lr.SetPositions(ToArray());
+            refresh();
         }
 
         public void NextPoint()
