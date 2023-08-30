@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//using Newtonsoft.Json;
 using System.IO;
 using System;
 using DS.Game.Luna;
 using DS.Tech.App;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
 
 namespace Tools
 {
@@ -26,20 +27,21 @@ namespace Tools
         // Use this for initialization
         void Start()
         {
+            RetrieveServers();
             SBNetworkManager.Instance.Server_HeroesSpawned += this.RetrieveServers;
 
-            currentRoute = new Route(gameObject,"Standard route", Color.cyan, "me");
-            /*
+            //currentRoute = new Route(gameObject,"Standard route", Color.cyan, "me");
             try
             {
-
-                Route r = new Route("Standard route", Color.cyan, "me");
-                //SaveRouteToJson(r);
-            }catch(Exception ex)
+                currentRoute = Route.LoadFromJson("Standard route", gameObject);
+                currentRoute.RefreshRoute();
+            }
+            catch (Exception ex)
             {
                 Debugger.Log(ex.Message);
             }
-            */
+            Debugger.Log("Imported : " + currentRoute.name);
+
         }
 
         // Update is called once per frame
@@ -69,6 +71,22 @@ namespace Tools
             {
                 currentRoute.GetCurrentSegment().RemovePoint();
             }
+            if (Input.GetKeyDown(KeyCode.I))
+            {
+                currentRoute.SaveToJson();
+            }
+            if (Input.GetKeyDown(KeyCode.U))
+            {
+                try
+                {
+                    currentRoute = Route.LoadFromJson("Standard route", gameObject);
+                    currentRoute.RefreshRoute();
+                }catch(Exception ex)
+                {
+                    Debugger.Log(ex.Message);
+                }
+                Debugger.Log("Imported : " + currentRoute.name);
+            }
         }
         /*
         public void SaveRouteToJson(Route route)
@@ -88,12 +106,16 @@ namespace Tools
         */
     }
 
+    [DataContract]
     public class Route
     {
-
+        [DataMember]
         public string name;
+        [DataMember]
         public Color color;
+        [DataMember]
         public string author;
+        [DataMember]
         List<Segment> segments;
         int segmentIndex;
         LineRenderer lr;
@@ -102,14 +124,7 @@ namespace Tools
         {
             try
             {
-
-                lr = routeHolder.AddComponent<LineRenderer>();
-                lr.sortingOrder = 32000;
-                lr.alignment = LineAlignment.View;
-                lr.startWidth = 0.07f;
-                lr.endWidth = 0.07f;
-                lr.material.shader = ToolsManager.Instance.shader;
-                lr.material.color = color;
+                SetupLineRenderer(routeHolder);
                 segmentIndex = 0;
                 segments = new List<Segment>();
                 this.name = name;
@@ -121,10 +136,66 @@ namespace Tools
             }
         }
 
+        public void SetupLineRenderer(GameObject routeHolder)
+        {
+            lr = routeHolder.AddComponent<LineRenderer>();
+            lr.sortingOrder = 32000;
+            lr.alignment = LineAlignment.View;
+            lr.startWidth = 0.07f;
+            lr.endWidth = 0.07f;
+            lr.material.shader = ToolsManager.Instance.shader;
+            lr.material.color = color;
+        }
+
+        public void SaveToJson()
+        {
+            string filePath = Path.Combine(ToolsManager.Instance.RoutesFolder, this.name + ".json");
+            using (FileStream fs = new FileStream(filePath, FileMode.Create))
+            {
+                var ser = new DataContractJsonSerializer(typeof(Route));
+                ser.WriteObject(fs, this);
+            }
+            //string json = JsonConvert.SerializeObject(this, Formatting.Indented);
+            //Debugger.Log(json);
+            //File.WriteAllText(filePath, json);
+
+        }
+        
+        public static Route LoadFromJson(string name, GameObject routeHolder)
+        {
+            
+            string filePath = Path.Combine(ToolsManager.Instance.RoutesFolder, name+".json");
+            //string json = File.ReadAllText(filePath);
+            //Route route = JsonConvert.DeserializeObject<Route>(json);
+            //return route;
+            if (File.Exists(filePath))
+            {
+                using (FileStream fs = new FileStream(filePath, FileMode.Open))
+                {
+                    var ser = new DataContractJsonSerializer(typeof(Route));
+                    Route importedRoute = (Route)ser.ReadObject(fs);
+                    importedRoute.SetupLineRenderer(routeHolder);
+                    importedRoute.segmentIndex = 0;
+                    importedRoute.segments.ForEach(e =>
+                    {
+                        e.refresh = importedRoute.RefreshRoute;
+                    });
+
+                    return importedRoute;
+                    // Now, 'importedRoute' contains the deserialized Route object from the JSON file.
+                }
+            }
+            else
+            {
+                return new Route(routeHolder, "default", Color.blue, "nobody");
+            }
+        }
+        
+
         public Segment GetCurrentSegment()
         {
             if (segmentIndex >= segments.Count)
-                segments.Add(new Segment(RefreshRoute));
+                segments.Add(new Segment(segmentIndex.ToString(),RefreshRoute));
             return segments[segmentIndex];
         }
 
@@ -132,7 +203,7 @@ namespace Tools
         {
             segmentIndex++;
             if (segmentIndex == segments.Count)
-                segments.Add(new Segment(RefreshRoute));
+                segments.Add(new Segment(segmentIndex.ToString(),RefreshRoute));
 
             RefreshRoute();
         }
@@ -147,28 +218,35 @@ namespace Tools
 
         public void RefreshRoute()
         {
-            lr.positionCount = GetCurrentSegment().Count;
-            lr.SetPositions(GetCurrentSegment().ToArray());
+            lr.positionCount = GetCurrentSegment().points.Count;
+            lr.SetPositions(GetCurrentSegment().points.ToArray());
         }
 
     }
 
-    public class Segment : List<Vector3>
+    [DataContract]
+    public class Segment
     {
+        [DataMember]
         public string name;
+        [DataMember]
+        public List<Vector3> points;
         int pointIndex;
-        readonly Action refresh;
+        public Action refresh { get; set; }
         GameObject sphere;
 
-        public Segment(Action RefreshRoute) : base()
+
+        public Segment(string name, Action RefreshRoute) 
         {
+            this.name = name;
             pointIndex = 0;
             refresh = RefreshRoute;
+            points = new List<Vector3>();
         }
 
         public void AddPoint(Vector3 coord)
         {
-            Insert(pointIndex, coord);
+            points.Insert(pointIndex, coord);
             NextPoint();
             refresh();
         }
@@ -176,13 +254,13 @@ namespace Tools
         public void RemovePoint()
         {
             LastPoint();
-            RemoveAt(pointIndex);
+            points.RemoveAt(pointIndex);
             refresh();
         }
 
         public void NextPoint()
         {
-            if(pointIndex<Count)
+            if(pointIndex< points.Count)
                 pointIndex++;
 
             RefreshPoint();
@@ -210,8 +288,7 @@ namespace Tools
                     sphere.GetComponent<MeshRenderer>().material.color = Color.blue;
                 }
 
-                sphere.transform.position = this[pointIndex-1];
-                Debugger.Log("Sphere to " + this[pointIndex - 1].ToString());
+                sphere.transform.position = points[pointIndex-1];
             }catch(Exception ex)
             {
                 Debugger.Log(ex.Message);
