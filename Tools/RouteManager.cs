@@ -23,7 +23,15 @@ namespace Tools
         public void RetrieveServers()
         {
             this.hero = FindObjectOfType<Hero_Server>();
-            Debugger.Log(SceneManager.GetActiveScene().name);
+            try
+            {
+                currentRoute.FindNearestSegment();
+            }
+            catch(Exception ex)
+            {
+                Debugger.Log(ex.Message);
+            }
+            
         }
 
         
@@ -167,7 +175,44 @@ namespace Tools
 
         public void FindNearestSegment()
         {
+            int upDistance = 0;
+            int upIndex = segmentIndex;
+            bool upFound = false;
+            int downDistance = 0;
+            int downIndex = segmentIndex;
+            bool downFound = false;
 
+            for (int i = segmentIndex; i < segments.Count; i++)
+            {
+                if(SceneManager.GetActiveScene().name.Equals(segments[i].name))
+                {
+                    upDistance =Math.Abs(i-segmentIndex);
+                    upIndex = i;
+                    upFound = true; 
+                }
+            }
+            for(int i = segmentIndex; i >= 0; i--)
+            {
+                if (SceneManager.GetActiveScene().name.Equals(segments[i].name))
+                {
+                    downDistance = Math.Abs(segmentIndex - i);
+                    downIndex = i;
+                    downFound = true;
+
+                }
+            }
+
+            if (upFound && !downFound)
+                segmentIndex = upIndex;
+            else if (downFound && !upFound)
+                segmentIndex = downIndex;
+            else if(downFound && upFound)
+                if(upDistance <= downDistance)
+                    segmentIndex = upIndex;
+                else
+                    segmentIndex = downIndex;
+            
+            RefreshRoute();
         }
 
 
@@ -218,7 +263,7 @@ namespace Tools
         public List<Vector2> points;
         int pointIndex;
         public Action refresh { get; set; }
-        GameObject sphere;
+        static GameObject sphere;
 
 
         public Segment(string name, Action RefreshRoute) 

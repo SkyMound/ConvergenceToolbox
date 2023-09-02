@@ -131,7 +131,8 @@ namespace Tools
 
         public void RetrieveShader()
         {
-
+            if (shader != null)
+                return;
             MeshRenderer[] mesh = FindObjectsOfType<MeshRenderer>();
             for (int i = 0; i < mesh.Length; i++)
             {
