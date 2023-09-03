@@ -19,6 +19,26 @@ namespace Tools
         Route currentRoute;
         public bool isEnabled;
         public bool isActive;
+        int selected = 0;
+        int newSelected = 0;
+        string[] files;
+
+        void OnGUI()
+        {
+            newSelected = GUILayout.SelectionGrid(selected, files, 1);
+            if(selected != newSelected)
+            {
+                currentRoute = Route.LoadFromJson(files[newSelected], gameObject);
+                currentRoute.FindNearestSegment();
+                selected = newSelected;
+            }
+        }
+
+        void OnEnable()
+        {
+            currentRoute = Route.LoadFromJson(files[newSelected], gameObject);
+            currentRoute.FindNearestSegment();
+        }
 
         public void RetrieveServers()
         {
@@ -39,9 +59,23 @@ namespace Tools
         // Use this for initialization
         void Start()
         {
-            RetrieveServers();
-            SBNetworkManager.Instance.Server_HeroesSpawned += this.RetrieveServers;
-            currentRoute = new Route(gameObject,"Standard route", Color.cyan, "me");
+            try
+            {
+
+                files = Directory.GetFiles(ToolsManager.Instance.RoutesFolder);
+                for(int i = 0; i< files.Length; i++)
+                {
+                    int fileNameStartIndex = files[i].LastIndexOf('\\')+1;
+                    Debugger.Log(files[i]+" - "+fileNameStartIndex.ToString());
+                    files[i] = files[i].Substring(fileNameStartIndex, files[i].LastIndexOf('.') - fileNameStartIndex);
+                }
+                currentRoute = new Route(gameObject,"Standard route", Color.cyan, "me");
+                RetrieveServers();
+                SBNetworkManager.Instance.Server_HeroesSpawned += this.RetrieveServers;
+            }catch(Exception ex)
+            {
+                Debugger.Log(ex.Message);
+            }
         }
 
         // Update is called once per frame
@@ -80,7 +114,7 @@ namespace Tools
                 try
                 {
                     currentRoute = Route.LoadFromJson("Standard route", gameObject);
-                    currentRoute.RefreshRoute();
+                    currentRoute.FindNearestSegment();
                 }
                 catch (Exception ex)
                 {
@@ -186,7 +220,7 @@ namespace Tools
             {
                 if(SceneManager.GetActiveScene().name.Equals(segments[i].name))
                 {
-                    upDistance =Math.Abs(i-segmentIndex);
+                    upDistance = Math.Abs(i-segmentIndex);
                     upIndex = i;
                     upFound = true; 
                 }
