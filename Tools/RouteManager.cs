@@ -25,12 +25,42 @@ namespace Tools
 
         void OnGUI()
         {
-            newSelected = GUILayout.SelectionGrid(selected, files, 1);
-            if(selected != newSelected)
+            try
             {
-                currentRoute = Route.LoadFromJson(files[newSelected], gameObject);
-                currentRoute.FindNearestSegment();
-                selected = newSelected;
+                GUIStyle style = new GUIStyle(GUI.skin.button);
+                GUILayout.BeginArea(new Rect(Screen.width - 120, 0, 120, Screen.height ));
+                newSelected = GUILayout.SelectionGrid(selected, files, 1,style);
+                GUILayout.EndArea();
+                if(selected != newSelected)
+                {
+                    if (newSelected == files.Length - 1)
+                    {
+                        int i = 0;
+                        string filename = "myRoute_" + i.ToString() + ".json";
+                        while (File.Exists(Path.Combine(ToolsManager.Instance.RoutesFolder, filename)))
+                        {
+                            i++;
+                            filename = "myRoute_" + i.ToString() + ".json";
+                        }
+                        File.CreateText(Path.Combine(ToolsManager.Instance.RoutesFolder, filename));
+                        currentRoute = new Route(gameObject, filename, Color.cyan, "community");
+                        UpdateSavedRoutes();
+                        for(int j = 0; j < files.Length; j++)
+                        {
+                            if (files[j].Equals("myRoute_" + i.ToString()))
+                                newSelected = j;
+                        }
+                    }
+                    else
+                    {
+                        currentRoute = Route.LoadFromJson(files[newSelected], gameObject);
+                        currentRoute.FindNearestSegment();
+                    }
+                    selected = newSelected;
+                }
+            }catch(Exception ex)
+            {
+                Debugger.Log(ex.Message);
             }
         }
 
@@ -54,28 +84,26 @@ namespace Tools
             
         }
 
+        void UpdateSavedRoutes()
+        {
+            string[] rawFiles = Directory.GetFiles(ToolsManager.Instance.RoutesFolder);
+            files = new string[rawFiles.Length+1];
+            for (int i = 0; i < rawFiles.Length; i++)
+            {
+                int fileNameStartIndex = rawFiles[i].LastIndexOf('\\') + 1;
+                files[i] = rawFiles[i].Substring(fileNameStartIndex, rawFiles[i].LastIndexOf('.') - fileNameStartIndex);
+            }
+            files[rawFiles.Length] = "+";
+        }
         
 
         // Use this for initialization
         void Start()
         {
-            try
-            {
-
-                files = Directory.GetFiles(ToolsManager.Instance.RoutesFolder);
-                for(int i = 0; i< files.Length; i++)
-                {
-                    int fileNameStartIndex = files[i].LastIndexOf('\\')+1;
-                    Debugger.Log(files[i]+" - "+fileNameStartIndex.ToString());
-                    files[i] = files[i].Substring(fileNameStartIndex, files[i].LastIndexOf('.') - fileNameStartIndex);
-                }
-                currentRoute = new Route(gameObject,"Standard route", Color.cyan, "me");
-                RetrieveServers();
-                SBNetworkManager.Instance.Server_HeroesSpawned += this.RetrieveServers;
-            }catch(Exception ex)
-            {
-                Debugger.Log(ex.Message);
-            }
+            UpdateSavedRoutes();
+            currentRoute = new Route(gameObject,"Standard route", Color.cyan, "me");
+            RetrieveServers();
+            SBNetworkManager.Instance.Server_HeroesSpawned += this.RetrieveServers;
         }
 
         // Update is called once per frame
