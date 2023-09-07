@@ -71,6 +71,13 @@ namespace Tools
                     gm.isEnabled = GUI.Toggle(new Rect(10, 90, 150, 20), gm.isEnabled, "Enable GodMode");
                     if (gm.isEnabled != gm.isActive)
                         gm.ToggleGodMode();
+
+                    // Route checkbox
+                    route.isEnabled = GUI.Toggle(new Rect(10, 110, 150, 20), route.isEnabled, "Show Route");
+                    if (route.isEnabled != route.enabled)
+                    {
+                        route.enabled = route.isEnabled;
+                    }
                 }
 
                 
