@@ -18,32 +18,35 @@ namespace Tools
         Hero_Server hero;
         Route currentRoute;
         public bool isEnabled;
-        public bool isActive;
         int selected = 0;
         int newSelected = 0;
         string[] files;
+        public static GameObject routeHolder;
 
         void OnGUI()
         {
             try
             {
+
                 GUIStyle style = new GUIStyle(GUI.skin.button);
                 GUILayout.BeginArea(new Rect(Screen.width - 120, 0, 120, Screen.height ));
                 newSelected = GUILayout.SelectionGrid(selected, files, 1,style);
+                GUILayout.Label(currentRoute.GetCurrentSegment().name);
                 GUILayout.EndArea();
                 if(selected != newSelected)
                 {
                     if (newSelected == files.Length - 1)
                     {
                         int i = 0;
-                        string filename = "myRoute_" + i.ToString() + ".json";
-                        while (File.Exists(Path.Combine(ToolsManager.Instance.RoutesFolder, filename)))
+                        string filename;
+                        do
                         {
-                            i++;
                             filename = "myRoute_" + i.ToString() + ".json";
-                        }
+                            i++;
+                        } while (File.Exists(Path.Combine(ToolsManager.Instance.RoutesFolder, filename)));
+                        currentRoute = new Route("myRoute_" + i.ToString(), Color.cyan, "community");
+                        currentRoute.RefreshRoute();
                         File.CreateText(Path.Combine(ToolsManager.Instance.RoutesFolder, filename));
-                        currentRoute = new Route(gameObject, filename, Color.cyan, "community");
                         UpdateSavedRoutes();
                         for(int j = 0; j < files.Length; j++)
                         {
@@ -53,35 +56,48 @@ namespace Tools
                     }
                     else
                     {
-                        currentRoute = Route.LoadFromJson(files[newSelected], gameObject);
-                        currentRoute.FindNearestSegment();
+                        currentRoute = Route.LoadFromJson(files[newSelected]);
                     }
                     selected = newSelected;
                 }
             }catch(Exception ex)
             {
-                Debugger.Log(ex.Message);
+                Debugger.Log("On GUI : "+ex.Message);
             }
         }
 
         void OnEnable()
         {
-            currentRoute = Route.LoadFromJson(files[newSelected], gameObject);
-            currentRoute.FindNearestSegment();
+            routeHolder.SetActive(true);
+            UpdateSavedRoutes();
+        }
+
+        void OnDisable()
+        {
+            routeHolder.SetActive(false);
         }
 
         public void RetrieveServers()
         {
-            this.hero = FindObjectOfType<Hero_Server>();
             try
             {
-                currentRoute.FindNearestSegment();
+
+            this.hero = FindObjectOfType<Hero_Server>();
+            }catch(Exception ex)
+            {
+                Debugger.Log("Retrieve servers " + ex.Message);
+            }
+            /*
+            try
+            {
+                currentRoute.segmentIndex = currentRoute.GetNearestSegment();
+                currentRoute.RefreshRoute();
             }
             catch(Exception ex)
             {
-                Debugger.Log(ex.Message);
+                Debugger.Log("Find nearest segment when retrieve serves : "+ex.Message);
             }
-            
+            */
         }
 
         void UpdateSavedRoutes()
@@ -100,8 +116,9 @@ namespace Tools
         // Use this for initialization
         void Start()
         {
+            routeHolder = new GameObject("RouteHolder");
             UpdateSavedRoutes();
-            currentRoute = new Route(gameObject,"Standard route", Color.cyan, "me");
+            currentRoute = Route.LoadFromJson(files[newSelected]);
             RetrieveServers();
             SBNetworkManager.Instance.Server_HeroesSpawned += this.RetrieveServers;
         }
@@ -127,7 +144,14 @@ namespace Tools
             }
             if (Input.GetKeyDown(KeyCode.Insert))
             {
-                currentRoute.GetCurrentSegment().AddPoint(hero.transform.position + new Vector3(0,1,0));
+                try
+                {
+                    currentRoute.GetCurrentSegment().AddPoint(hero.transform.position + new Vector3(0,1,0));
+                    Debugger.Log("Inserted");
+                }catch(Exception ex)
+                {
+                    Debugger.Log("Inserting failed : " + ex.Message);
+                }
             }
             if (Input.GetKeyDown(KeyCode.Delete))
             {
@@ -135,20 +159,13 @@ namespace Tools
             }
             if (Input.GetKeyDown(KeyCode.I))
             {
-                currentRoute.SaveToJson();
-            }
-            if (Input.GetKeyDown(KeyCode.U))
-            {
                 try
                 {
-                    currentRoute = Route.LoadFromJson("Standard route", gameObject);
-                    currentRoute.FindNearestSegment();
-                }
-                catch (Exception ex)
+                    currentRoute.SaveToJson();
+                }catch(Exception ex)
                 {
                     Debugger.Log(ex.Message);
                 }
-                Debugger.Log("Imported : " + currentRoute.name);
             }
         }
     }
@@ -164,31 +181,25 @@ namespace Tools
         public string author;
         [DataMember]
         List<Segment> segments;
-        int segmentIndex;
+        public int segmentIndex;
         LineRenderer lr;
 
-        public Route(GameObject routeHolder, string name, Color color, string author)
+        public Route(string name, Color color, string author)
         {
-            try
-            {
-                SetupLineRenderer(routeHolder);
-                segmentIndex = 0;
-                segments = new List<Segment>();
-                this.name = name;
-                this.color = color;
-                this.author = author;
-            }catch(Exception ex)
-            {
-                Debugger.Log(ex.Message);
-            }
+            SetupLineRenderer();
+            segmentIndex = 0;
+            segments = new List<Segment>();
+            this.name = name;
+            this.color = color;
+            this.author = author;
         }
 
-        public void SetupLineRenderer(GameObject routeHolder)
+        public void SetupLineRenderer()
         { 
-            lr = routeHolder.GetComponent<LineRenderer>();
+            lr = RouteManager.routeHolder.GetComponent<LineRenderer>();
             if (lr == null)
             {
-                lr = routeHolder.AddComponent<LineRenderer>();
+                lr = RouteManager.routeHolder.AddComponent<LineRenderer>();
             }
             lr.sortingOrder = 32000;
             lr.alignment = LineAlignment.View;
@@ -200,81 +211,106 @@ namespace Tools
 
         public void SaveToJson()
         {
-            string filePath = Path.Combine(ToolsManager.Instance.RoutesFolder, this.name + ".json");
-            using (FileStream fs = new FileStream(filePath, FileMode.Create))
+            try
             {
-                var ser = new DataContractJsonSerializer(typeof(Route));
-                ser.WriteObject(fs, this);
+                string filePath = Path.Combine(ToolsManager.Instance.RoutesFolder, this.name + ".json");
+                using (FileStream fs = new FileStream(filePath, FileMode.Create))
+                {
+                    var ser = new DataContractJsonSerializer(typeof(Route));
+                    ser.WriteObject(fs, this);
+                }
+            }catch(Exception ex)
+            {
+                Debugger.Log("Saving json :" + ex.Message);
             }
         }
         
-        public static Route LoadFromJson(string name, GameObject routeHolder)
+        public static Route LoadFromJson(string name)
         {
-            
-            string filePath = Path.Combine(ToolsManager.Instance.RoutesFolder, name+".json");
-            if (File.Exists(filePath))
+            try
             {
-                using (FileStream fs = new FileStream(filePath, FileMode.Open))
+                string filePath = Path.Combine(ToolsManager.Instance.RoutesFolder, name + ".json");
+                if (File.Exists(filePath))
                 {
-                    var ser = new DataContractJsonSerializer(typeof(Route));
-                    Route importedRoute = (Route)ser.ReadObject(fs);
-                    importedRoute.SetupLineRenderer(routeHolder);
+                    Route importedRoute;
+                    using (FileStream fs = new FileStream(filePath, FileMode.Open))
+                    {
+                        var ser = new DataContractJsonSerializer(typeof(Route));
+                        importedRoute = (Route)ser.ReadObject(fs);
+                    }
+                    importedRoute.SetupLineRenderer();
                     importedRoute.segmentIndex = 0;
                     importedRoute.segments.ForEach(e =>
                     {
                         e.refresh = importedRoute.RefreshRoute;
                     });
-
+                    importedRoute.segmentIndex = importedRoute.GetNearestSegment();
+                    importedRoute.RefreshRoute();
                     return importedRoute;
-                    // Now, 'importedRoute' contains the deserialized Route object from the JSON file.
                 }
-            }
-            else
+                else
+                {
+                    return new Route(name, Color.cyan, "community");
+                }
+            }catch(Exception ex)
             {
-                return new Route(routeHolder, "default", Color.blue, "nobody");
+                Debugger.Log("Failed to load route : "+ex.Message);
+                return new Route(name, Color.cyan, "community");
             }
+            
         }
 
-        public void FindNearestSegment()
+        public int GetNearestSegment()
         {
-            int upDistance = 0;
-            int upIndex = segmentIndex;
-            bool upFound = false;
-            int downDistance = 0;
-            int downIndex = segmentIndex;
-            bool downFound = false;
-
-            for (int i = segmentIndex; i < segments.Count; i++)
+            try
             {
-                if(SceneManager.GetActiveScene().name.Equals(segments[i].name))
+                int upDistance = 0;
+                int upIndex = segmentIndex;
+                bool upFound = false;
+                int downDistance = 0;
+                int downIndex = segmentIndex;
+                bool downFound = false;
+
+                if (segments.Count <= 1)
+                    return segmentIndex;
+
+                for (int i = segmentIndex; i < segments.Count; i++)
                 {
-                    upDistance = Math.Abs(i-segmentIndex);
-                    upIndex = i;
-                    upFound = true; 
+                    if(SceneManager.GetActiveScene().name.Equals(segments[i].name))
+                    {
+                        upDistance = Math.Abs(i-segmentIndex);
+                        upIndex = i;
+                        upFound = true; 
+                    }
                 }
-            }
-            for(int i = segmentIndex; i >= 0; i--)
+                for(int i = segmentIndex; i >= 0; i--)
+                {
+                    if (SceneManager.GetActiveScene().name.Equals(segments[i].name))
+                    {
+                        downDistance = Math.Abs(segmentIndex - i);
+                        downIndex = i;
+                        downFound = true;
+
+                    }
+                }
+
+                if (upFound && !downFound)
+                    return upIndex;
+                else if (downFound && !upFound)
+                    return downIndex;
+                else if(downFound && upFound)
+                    if(upDistance <= downDistance)
+                        return upIndex;
+                    else
+                        return downIndex;
+                return segmentIndex;
+
+            }catch(Exception ex)
             {
-                if (SceneManager.GetActiveScene().name.Equals(segments[i].name))
-                {
-                    downDistance = Math.Abs(segmentIndex - i);
-                    downIndex = i;
-                    downFound = true;
+                Debugger.Log(ex.Message);
+                return segmentIndex;
 
-                }
             }
-
-            if (upFound && !downFound)
-                segmentIndex = upIndex;
-            else if (downFound && !upFound)
-                segmentIndex = downIndex;
-            else if(downFound && upFound)
-                if(upDistance <= downDistance)
-                    segmentIndex = upIndex;
-                else
-                    segmentIndex = downIndex;
-            
-            RefreshRoute();
         }
 
 
@@ -323,7 +359,7 @@ namespace Tools
         public string name;
         [DataMember]
         public List<Vector2> points;
-        int pointIndex;
+        int pointIndex = -1;
         public Action refresh { get; set; }
         static GameObject sphere;
 
@@ -331,28 +367,28 @@ namespace Tools
         public Segment(string name, Action RefreshRoute) 
         {
             this.name = name;
-            pointIndex = 0;
+            pointIndex = -1;
             refresh = RefreshRoute;
             points = new List<Vector2>();
         }
 
         public void AddPoint(Vector2 coord)
         {
-            points.Insert(pointIndex, coord);
+            points.Insert(pointIndex+1, coord);
             NextPoint();
             refresh();
         }
 
         public void RemovePoint()
         {
-            LastPoint();
             points.RemoveAt(pointIndex);
+            LastPoint();
             refresh();
         }
 
         public void NextPoint()
         {
-            if(pointIndex< points.Count)
+            if(pointIndex< points.Count-1)
                 pointIndex++;
 
             RefreshPoint();
@@ -360,7 +396,7 @@ namespace Tools
 
         public void LastPoint()
         {
-            if (pointIndex > 0)
+            if (pointIndex >= 0)
                 pointIndex--;
 
             RefreshPoint();
@@ -368,9 +404,14 @@ namespace Tools
 
         void RefreshPoint()
         {
+            
             try
             {
-
+                if (points.Count == 0 || pointIndex == -1)
+                {
+                    GameObject.Destroy(sphere);
+                    return;
+                }
                 if (sphere == null)
                 {
 
@@ -380,7 +421,7 @@ namespace Tools
                     sphere.GetComponent<MeshRenderer>().material.color = Color.blue;
                 }
 
-                sphere.transform.position = points[pointIndex-1];
+                sphere.transform.position = points[pointIndex];
             }catch(Exception ex)
             {
                 Debugger.Log(ex.Message);
