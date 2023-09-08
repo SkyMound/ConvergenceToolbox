@@ -37,27 +37,30 @@ namespace Tools
                 {
                     if (newSelected == files.Length - 1)
                     {
-                        int i = 0;
+                        int i = -1;
                         string filename;
                         do
                         {
-                            filename = "myRoute_" + i.ToString() + ".json";
                             i++;
+                            filename = "myRoute_" + i.ToString() + ".json";
                         } while (File.Exists(Path.Combine(ToolsManager.Instance.RoutesFolder, filename)));
                         currentRoute = new Route("myRoute_" + i.ToString(), Color.cyan, "community");
-                        currentRoute.RefreshRoute();
-                        File.CreateText(Path.Combine(ToolsManager.Instance.RoutesFolder, filename));
+                        StreamWriter sr = File.CreateText(Path.Combine(ToolsManager.Instance.RoutesFolder, filename));
+                        sr.Close();
                         UpdateSavedRoutes();
-                        for(int j = 0; j < files.Length; j++)
+                        for (int j = 0; j < files.Length; j++)
                         {
                             if (files[j].Equals("myRoute_" + i.ToString()))
+                            {
                                 newSelected = j;
+                            }
                         }
                     }
                     else
                     {
                         currentRoute = Route.LoadFromJson(files[newSelected]);
                     }
+                    currentRoute.RefreshRoute();
                     selected = newSelected;
                 }
             }catch(Exception ex)
@@ -81,7 +84,6 @@ namespace Tools
         {
             try
             {
-
                 this.hero = FindObjectOfType<Hero_Server>();
                 currentRoute.segmentIndex = currentRoute.GetNearestSegment();
                 currentRoute.RefreshRoute();
@@ -112,6 +114,7 @@ namespace Tools
             routeHolder.transform.SetParent(gameObject.transform);
             UpdateSavedRoutes();
             currentRoute = Route.LoadFromJson(files[newSelected]);
+            currentRoute.RefreshRoute();
             RetrieveServers();
             SBNetworkManager.Instance.Server_HeroesSpawned += this.RetrieveServers;
         }
@@ -143,7 +146,7 @@ namespace Tools
             {
                 currentRoute.GetCurrentSegment().RemovePoint();
             }
-            if (Input.GetKeyDown(KeyCode.S) && Input.GetKeyDown(KeyCode.LeftControl))
+            if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.S))
             {
                 try
                 {
@@ -172,27 +175,34 @@ namespace Tools
 
         public Route(string name, Color color, string author)
         {
-            SetupLineRenderer();
             segmentIndex = 0;
             segments = new List<Segment>();
             this.name = name;
             this.color = color;
             this.author = author;
+            SetupLineRenderer();
         }
 
         public void SetupLineRenderer()
-        { 
-            lr = RouteManager.routeHolder.GetComponent<LineRenderer>();
-            if (lr == null)
+        {
+            try
             {
-                lr = RouteManager.routeHolder.AddComponent<LineRenderer>();
+
+                lr = RouteManager.routeHolder.GetComponent<LineRenderer>();
+                if (lr == null)
+                {
+                    lr = RouteManager.routeHolder.AddComponent<LineRenderer>();
+                }
+                lr.sortingOrder = 32000;
+                lr.alignment = LineAlignment.View;
+                lr.startWidth = 0.07f;
+                lr.endWidth = 0.07f;
+                lr.material.shader = ToolsManager.Instance.shader;
+                lr.material.color = color;
+            }catch(Exception ex)
+            {
+                Debugger.Log(ex.Message);
             }
-            lr.sortingOrder = 32000;
-            lr.alignment = LineAlignment.View;
-            lr.startWidth = 0.07f;
-            lr.endWidth = 0.07f;
-            lr.material.shader = ToolsManager.Instance.shader;
-            lr.material.color = color;
         }
 
         public void SaveToJson()
@@ -231,7 +241,6 @@ namespace Tools
                         e.refresh = importedRoute.RefreshRoute;
                     });
                     importedRoute.segmentIndex = importedRoute.GetNearestSegment();
-                    importedRoute.RefreshRoute();
                     return importedRoute;
                 }
                 else
