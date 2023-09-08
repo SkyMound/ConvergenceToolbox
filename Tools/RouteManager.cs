@@ -1,18 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System;
 using DS.Game.Luna;
-using DS.Tech.App;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using UnityEngine.SceneManagement;
 
 namespace Tools
 {
-
-
     public class RouteManager : MonoBehaviour
     {
         Hero_Server hero;
@@ -187,7 +183,6 @@ namespace Tools
         {
             try
             {
-
                 lr = RouteManager.routeHolder.GetComponent<LineRenderer>();
                 if (lr == null)
                 {
