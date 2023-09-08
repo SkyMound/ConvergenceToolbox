@@ -82,22 +82,14 @@ namespace Tools
             try
             {
 
-            this.hero = FindObjectOfType<Hero_Server>();
-            }catch(Exception ex)
-            {
-                Debugger.Log("Retrieve servers " + ex.Message);
-            }
-            /*
-            try
-            {
+                this.hero = FindObjectOfType<Hero_Server>();
                 currentRoute.segmentIndex = currentRoute.GetNearestSegment();
                 currentRoute.RefreshRoute();
             }
             catch(Exception ex)
             {
-                Debugger.Log("Find nearest segment when retrieve serves : "+ex.Message);
+                Debugger.Log("Retrieve servers " + ex.Message);
             }
-            */
         }
 
         void UpdateSavedRoutes()
@@ -117,6 +109,7 @@ namespace Tools
         void Start()
         {
             routeHolder = new GameObject("RouteHolder");
+            routeHolder.transform.SetParent(gameObject.transform);
             UpdateSavedRoutes();
             currentRoute = Route.LoadFromJson(files[newSelected]);
             RetrieveServers();
@@ -144,20 +137,13 @@ namespace Tools
             }
             if (Input.GetKeyDown(KeyCode.Insert))
             {
-                try
-                {
-                    currentRoute.GetCurrentSegment().AddPoint(hero.transform.position + new Vector3(0,1,0));
-                    Debugger.Log("Inserted");
-                }catch(Exception ex)
-                {
-                    Debugger.Log("Inserting failed : " + ex.Message);
-                }
+                currentRoute.GetCurrentSegment().AddPoint(hero.transform.position + new Vector3(0,1,0));
             }
             if (Input.GetKeyDown(KeyCode.Delete))
             {
                 currentRoute.GetCurrentSegment().RemovePoint();
             }
-            if (Input.GetKeyDown(KeyCode.I))
+            if (Input.GetKeyDown(KeyCode.S) && Input.GetKeyDown(KeyCode.LeftControl))
             {
                 try
                 {
@@ -280,7 +266,8 @@ namespace Tools
                     {
                         upDistance = Math.Abs(i-segmentIndex);
                         upIndex = i;
-                        upFound = true; 
+                        upFound = true;
+                        break;
                     }
                 }
                 for(int i = segmentIndex; i >= 0; i--)
@@ -290,7 +277,7 @@ namespace Tools
                         downDistance = Math.Abs(segmentIndex - i);
                         downIndex = i;
                         downFound = true;
-
+                        break;
                     }
                 }
 
