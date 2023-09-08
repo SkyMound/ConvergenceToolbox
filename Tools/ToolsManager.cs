@@ -3,6 +3,7 @@ using UnityEngine;
 using System.IO;
 using System.IO.Pipes;
 using System;
+using DS.Game.Luna;
 
 namespace Tools
 {
@@ -12,11 +13,13 @@ namespace Tools
         Gizmos gizmos;
         GodMode gm;
         AbilityLogger logger;
+        RouteManager route;
+        public Shader shader;
         bool uiEnabled;
 
-        public string Version { get; private set; } = "1.2.0";
+        public string Version { get; private set; } = "1.3.0";
         public string steamID { get; private set;} = "317573976";
-        public string SavesFolder { get; private set; }
+        public string RoutesFolder { get; private set; }
         public string SteamSavesFolder {get; private set;}
 
         private static ToolsManager _instance;
@@ -68,6 +71,13 @@ namespace Tools
                     gm.isEnabled = GUI.Toggle(new Rect(10, 90, 150, 20), gm.isEnabled, "Enable GodMode");
                     if (gm.isEnabled != gm.isActive)
                         gm.ToggleGodMode();
+
+                    // Route checkbox
+                    route.isEnabled = GUI.Toggle(new Rect(10, 110, 150, 20), route.isEnabled, "Show Route");
+                    if (route.isEnabled != route.enabled)
+                    {
+                        route.enabled = route.isEnabled;
+                    }
                 }
 
                 
@@ -111,15 +121,42 @@ namespace Tools
 
             if (!string.IsNullOrEmpty(projectPath))
             {
-                SavesFolder = Path.Combine(projectPath, "Saves");
-                Debugger.Log("Saves folder : " + SavesFolder);
+                RoutesFolder = Path.Combine(projectPath, "Routes");
+                Debugger.Log("Saves folder : " + RoutesFolder);
             }
+
+            RetrieveShader();
+            SBNetworkManager.Instance.Server_HeroesSpawned += RetrieveShader;
 
             autoSplit   = gameObject.AddComponent<AutoSplit>();
             gizmos      = gameObject.AddComponent<Gizmos>();
             logger      = gameObject.AddComponent<AbilityLogger>();
+            route       = gameObject.AddComponent<RouteManager>();
             gm          = new GodMode();
             uiEnabled   = true;
         }
+
+        public void RetrieveShader()
+        {
+            if (shader != null)
+                return;
+            MeshRenderer[] mesh = FindObjectsOfType<MeshRenderer>();
+            for (int i = 0; i < mesh.Length; i++)
+            {
+
+                if (mesh[i].material.shader.ToString().IndexOf("Flat", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    mesh[i].material.shader.ToString().IndexOf("Color", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    mesh[i].material.shader.ToString().IndexOf("Sprites/Default", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    mesh[i].material.shader.ToString().IndexOf("MultiAlpha_Unlit", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    shader = mesh[i].material.shader;
+                    Debugger.Log("Found : " + shader.name);
+                    return;
+                }
+            }
+            Debugger.Log("No shader found !");
+        }
     }
+
+
 }
