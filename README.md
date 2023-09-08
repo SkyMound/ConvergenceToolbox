@@ -30,7 +30,6 @@ Let's now see how to setup the Autsplit with LiveSplit.
 
 # Features
 
-## Implemented
 - Autosplit
     - Automatic start, split and stop.
     - Handles RTA (start to end no pauses at all) and IGT (without loads, menu pauses) timers.
@@ -38,10 +37,11 @@ Let's now see how to setup the Autsplit with LiveSplit.
     - Hitbox trigger for Checkpoint, Battle, Cutscene and Level Loader.
 - God Mode (Unlock lots of cheats and utilities build by the developpers to debug the game)
 - Abilites logger (display on screen abilites pressed and held)
-
-## Upcoming
-- In-game Tips/Tricks
-- Route suggestion/creation and sharing
+- Route Editor
+    - Create your own routes for any sort of run
+    - Share your routes to the community, so they can practice
+    - Edit already existing routes
+    - Access the current WR route to learn it faster
 
 # Contributing
 
