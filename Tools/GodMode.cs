@@ -1,4 +1,8 @@
-﻿using DS.Tech.App;
+﻿using DS.Game.Items;
+using DS.Game.Luna;
+using DS.Game.Updraft;
+using DS.Tech.App;
+using DS.Tech.Pooling;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,6 +41,21 @@ namespace Tools
                 Debugger.Log(ex.Message);
             }
             
+        }
+
+
+        public void RemoveAllSkills()
+        {
+            InventoryStacker stacker = UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.PermanentPlayerInventory.Stacker;
+            List<ItemData> list;
+            CollectionPool.Request<ItemData>(out list);
+            list.AddRange(ItemManager.Instance.SkillItemDatas);
+            foreach (ItemData itemData in list) 
+            {
+                Debugger.Log("Item");
+                stacker.SetAmount(itemData, 0);
+            }
+            CollectionPool.Return<ItemData>(ref list);
         }
     }
 }

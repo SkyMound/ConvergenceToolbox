@@ -67,17 +67,21 @@ namespace Tools
                     if (gizmos.isEnabled != gizmos.isActive)
                         gizmos.UpdateGizmos();
 
-                    // GodMode checkbox
-                    gm.isEnabled = GUI.Toggle(new Rect(10, 90, 150, 20), gm.isEnabled, "Enable GodMode");
-                    if (gm.isEnabled != gm.isActive)
-                        gm.ToggleGodMode();
-
                     // Route checkbox
-                    route.isEnabled = GUI.Toggle(new Rect(10, 110, 150, 20), route.isEnabled, "Show Route");
+                    route.isEnabled = GUI.Toggle(new Rect(10, 90, 150, 20), route.isEnabled, "Show Route");
                     if (route.isEnabled != route.enabled)
                     {
                         route.enabled = route.isEnabled;
                     }
+
+                    // GodMode checkbox
+                    gm.isEnabled = GUI.Toggle(new Rect(10, 110, 150, 20), gm.isEnabled, "Enable GodMode");
+                    if (gm.isEnabled != gm.isActive)
+                        gm.ToggleGodMode();
+
+                    if (GUI.Button(new Rect(10, 130, 120, 20), "Remove Skills"))
+                        gm.RemoveAllSkills();
+
                 }
 
                 
