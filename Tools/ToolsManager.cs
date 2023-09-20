@@ -15,7 +15,7 @@ namespace Tools
         AbilityLogger logger;
         RouteManager route;
         public Shader shader;
-        bool uiEnabled;
+        public bool uiEnabled { get; private set; }
 
         public string Version { get; private set; } = "1.3.1";
         public string steamID { get; private set;} = "317573976";
@@ -44,9 +44,9 @@ namespace Tools
                 // Autosplit checkbox
                 autoSplit.isEnabled = GUI.Toggle(new Rect(10, 30, 150, 20), autoSplit.isEnabled, "Enable AutoSplit");
 
-                if (autoSplit.isEnabled && !autoSplit.isActive){
+                if (autoSplit.isEnabled && !autoSplit.isActive)
                     autoSplit.StartAutoSplit();
-                }
+                
                 else if (!autoSplit.isEnabled && autoSplit.isActive)
                     autoSplit.StopAutoSplit();
 

@@ -23,41 +23,43 @@ namespace Tools
         {
             try
             {
-
-                GUIStyle style = new GUIStyle(GUI.skin.button);
-                GUILayout.BeginArea(new Rect(Screen.width - 120, 0, 120, Screen.height ));
-                newSelected = GUILayout.SelectionGrid(selected, files, 1,style);
-                GUILayout.Label(currentRoute.GetCurrentSegment().name);
-                GUILayout.EndArea();
-                if(selected != newSelected)
+                if (ToolsManager.Instance.uiEnabled)
                 {
-                    if (newSelected == files.Length - 1)
+                    GUIStyle style = new GUIStyle(GUI.skin.button);
+                    GUILayout.BeginArea(new Rect(Screen.width - 120, 0, 120, Screen.height ));
+                    newSelected = GUILayout.SelectionGrid(selected, files, 1,style);
+                    GUILayout.Label(currentRoute.GetCurrentSegment().name);
+                    GUILayout.EndArea();
+                    if(selected != newSelected)
                     {
-                        int i = -1;
-                        string filename;
-                        do
+                        if (newSelected == files.Length - 1)
                         {
-                            i++;
-                            filename = "myRoute_" + i.ToString() + ".json";
-                        } while (File.Exists(Path.Combine(ToolsManager.Instance.RoutesFolder, filename)));
-                        currentRoute = new Route("myRoute_" + i.ToString(), Color.cyan, "community");
-                        StreamWriter sr = File.CreateText(Path.Combine(ToolsManager.Instance.RoutesFolder, filename));
-                        sr.Close();
-                        UpdateSavedRoutes();
-                        for (int j = 0; j < files.Length; j++)
-                        {
-                            if (files[j].Equals("myRoute_" + i.ToString()))
+                            int i = -1;
+                            string filename;
+                            do
                             {
-                                newSelected = j;
+                                i++;
+                                filename = "myRoute_" + i.ToString() + ".json";
+                            } while (File.Exists(Path.Combine(ToolsManager.Instance.RoutesFolder, filename)));
+                            currentRoute = new Route("myRoute_" + i.ToString(), Color.cyan, "community");
+                            StreamWriter sr = File.CreateText(Path.Combine(ToolsManager.Instance.RoutesFolder, filename));
+                            sr.Close();
+                            UpdateSavedRoutes();
+                            for (int j = 0; j < files.Length; j++)
+                            {
+                                if (files[j].Equals("myRoute_" + i.ToString()))
+                                {
+                                    newSelected = j;
+                                }
                             }
                         }
+                        else
+                        {
+                            currentRoute = Route.LoadFromJson(files[newSelected]);
+                        }
+                        currentRoute.RefreshRoute();
+                        selected = newSelected;
                     }
-                    else
-                    {
-                        currentRoute = Route.LoadFromJson(files[newSelected]);
-                    }
-                    currentRoute.RefreshRoute();
-                    selected = newSelected;
                 }
             }catch(Exception ex)
             {
