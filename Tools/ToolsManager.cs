@@ -46,10 +46,6 @@ namespace Tools
 
                 if (autoSplit.isEnabled && !autoSplit.isActive){
                     autoSplit.StartAutoSplit();
-                    gizmos.isEnabled = false;
-                    gizmos.UpdateGizmos();
-                    gm.isEnabled = false;
-                    gm.ToggleGodMode();
                 }
                 else if (!autoSplit.isEnabled && autoSplit.isActive)
                     autoSplit.StopAutoSplit();
@@ -59,30 +55,27 @@ namespace Tools
                 if (logger.isEnabled != logger.isActive)
                     logger.ToggleAbilityLogger();
 
-                if (!autoSplit.isEnabled){
+                
+                // Gizmos checkbox
+                gizmos.isEnabled = GUI.Toggle(new Rect(10, 70, 150, 20), gizmos.isEnabled, "Show Gizmos");
 
-                    // Gizmos checkbox
-                    gizmos.isEnabled = GUI.Toggle(new Rect(10, 70, 150, 20), gizmos.isEnabled, "Show Gizmos");
+                if (gizmos.isEnabled != gizmos.isActive)
+                    gizmos.UpdateGizmos();
 
-                    if (gizmos.isEnabled != gizmos.isActive)
-                        gizmos.UpdateGizmos();
-
-                    // Route checkbox
-                    route.isEnabled = GUI.Toggle(new Rect(10, 90, 150, 20), route.isEnabled, "Show Route");
-                    if (route.isEnabled != route.enabled)
-                    {
-                        route.enabled = route.isEnabled;
-                    }
-
-                    // GodMode checkbox
-                    gm.isEnabled = GUI.Toggle(new Rect(10, 110, 150, 20), gm.isEnabled, "Enable GodMode");
-                    if (gm.isEnabled != gm.isActive)
-                        gm.ToggleGodMode();
-
-                    if (GUI.Button(new Rect(10, 130, 120, 20), "Remove Skills"))
-                        gm.RemoveAllSkills();
-
+                // Route checkbox
+                route.isEnabled = GUI.Toggle(new Rect(10, 90, 150, 20), route.isEnabled, "Show Route");
+                if (route.isEnabled != route.enabled)
+                {
+                    route.enabled = route.isEnabled;
                 }
+
+                // GodMode checkbox
+                gm.isEnabled = GUI.Toggle(new Rect(10, 110, 150, 20), gm.isEnabled, "Enable GodMode");
+                if (gm.isEnabled != gm.isActive)
+                    gm.ToggleGodMode();
+
+                if (GUI.Button(new Rect(10, 130, 120, 20), "Remove Skills"))
+                    gm.RemoveAllSkills();
 
                 
             }
