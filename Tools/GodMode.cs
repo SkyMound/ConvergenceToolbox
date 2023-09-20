@@ -44,16 +44,20 @@ namespace Tools
         }
 
 
-        public void RemoveAllSkills()
+        public void SetSpeedrunPreset()
         {
             InventoryStacker stacker = UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.PermanentPlayerInventory.Stacker;
             List<ItemData> list;
             CollectionPool.Request<ItemData>(out list);
             list.AddRange(ItemManager.Instance.SkillItemDatas);
+            list.AddRange(ItemManager.Instance.GadgetItemDatas);
+
             foreach (ItemData itemData in list) 
             {
-                Debugger.Log("Item");
                 stacker.SetAmount(itemData, 0);
+                if (itemData.GameObject.name.Equals("Gadget_RewindBuff"))
+                    stacker.SetAmount(itemData, 1);
+                
             }
             CollectionPool.Return<ItemData>(ref list);
         }

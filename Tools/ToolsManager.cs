@@ -74,8 +74,8 @@ namespace Tools
                 if (gm.isEnabled != gm.isActive)
                     gm.ToggleGodMode();
 
-                if (GUI.Button(new Rect(10, 130, 120, 20), "Remove Skills"))
-                    gm.RemoveAllSkills();
+                if (GUI.Button(new Rect(10, 130, 120, 20), "Speedrun Preset"))
+                    gm.SetSpeedrunPreset();
 
                 
             }
