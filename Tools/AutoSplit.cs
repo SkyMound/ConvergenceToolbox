@@ -83,8 +83,9 @@ namespace Tools
         {
             if (!itemID.IsValid() || newAmount <= oldAmount)
                 return;
-            if(_isRunning && itemID == Configuration<AchievementConfig>.Instance.Asset.FutureEkko3DefeatedItemID)
+            if (_isRunning && itemID == Configuration<AchievementConfig>.Instance.Asset.FutureEkko3DefeatedItemID)
             {
+                Debugger.Log("Defeat ekko");
                 SendCommand(CommandType.Stop);
             }
             
@@ -162,6 +163,7 @@ namespace Tools
                         _splitNumber++;
                         break;
                     case CommandType.Stop:
+                        Debugger.Log("Stopping");
                         int splitsSkipped = 19 - _splitNumber;
                         for(int sk = 0; sk < splitsSkipped; sk++){
                             message += "skipsplit\r\n";
@@ -169,6 +171,7 @@ namespace Tools
                         message += "split\r\n";
                         _isRunning = false;
                         UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.MergedInventoryStacker.ItemAmountChanged -= endOfRunListener;
+                        Debugger.Log("Stopped");
                         break;
                     case CommandType.Resume:
                         message = "unpausegametime\r\n";
