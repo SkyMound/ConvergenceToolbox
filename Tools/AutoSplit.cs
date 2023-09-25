@@ -50,7 +50,14 @@ namespace Tools
 
         public int GetGadgetSlots()
         {
-            return UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.MergedInventoryStacker.GetAmount(GameConfig.Instance.GadgetSlotItemID);
+            try
+            {
+                return UpdraftGame.Instance.SaveProfileManager.CurrentSaveProfile.Data.MergedInventoryStacker.GetAmount(GameConfig.Instance.GadgetSlotItemID);
+            }catch(Exception ex)
+            {
+                Debugger.Log("Gadget slot check : "+ex.Message);
+                return 0;
+            }
         }
 
         public UpdraftWorldZone GetWorldZone()
